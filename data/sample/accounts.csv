@@ -1,0 +1,8 @@
+account_id,name,institution,type,subtype,balance,currency
+chk_001,Chase Checking,Chase,depository,checking,5420.50,USD
+sav_001,Marcus HYSA,Goldman Sachs,depository,savings,28500.00,USD
+cc_001,Chase Sapphire Reserve,Chase,credit,credit_card,-2340.15,USD
+cc_002,Citi Double Cash,Citibank,credit,credit_card,-890.40,USD
+inv_001,Fidelity Brokerage,Fidelity,investment,brokerage,0,USD
+ira_001,Fidelity Roth IRA,Fidelity,investment,roth,0,USD
+loan_001,Auto Loan,Toyota Financial,loan,auto,-18500.00,USD

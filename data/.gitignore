@@ -1,0 +1,5 @@
+# Ignore real financial data — only sample data is tracked
+*
+!sample/
+!sample/**
+!.gitignore

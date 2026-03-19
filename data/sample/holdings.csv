@@ -1,0 +1,8 @@
+account_id,symbol,name,shares,cost_basis_per_share,current_price
+inv_001,VTI,Vanguard Total Stock Market ETF,42.5,198.30,261.45
+inv_001,VXUS,Vanguard Total Intl Stock ETF,28.0,52.10,61.20
+inv_001,BND,Vanguard Total Bond Market ETF,35.0,74.80,73.25
+inv_001,AAPL,Apple Inc,10.0,142.50,213.49
+ira_001,VTI,Vanguard Total Stock Market ETF,85.0,185.20,261.45
+ira_001,VXUS,Vanguard Total Intl Stock ETF,55.0,48.90,61.20
+ira_001,BND,Vanguard Total Bond Market ETF,60.0,76.20,73.25

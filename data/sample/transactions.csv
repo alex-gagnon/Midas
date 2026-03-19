@@ -1,0 +1,21 @@
+date,amount,description,category,account_id
+2026-03-01,3500.00,Direct Deposit - ACME Corp,income,chk_001
+2026-03-15,3500.00,Direct Deposit - ACME Corp,income,chk_001
+2026-03-01,-1800.00,March Rent,housing,chk_001
+2026-03-02,-145.00,Con Edison Electric,utilities,chk_001
+2026-03-03,-89.50,Whole Foods Market,groceries,cc_001
+2026-03-05,-64.20,Trader Joe's,groceries,cc_001
+2026-03-06,-52.00,Netflix + Spotify,subscriptions,cc_001
+2026-03-07,-18.50,Starbucks,dining,cc_001
+2026-03-08,-280.00,Delta Airlines,travel,cc_001
+2026-03-09,-120.00,Equinox Gym,fitness,cc_001
+2026-03-10,-87.30,Amazon,shopping,cc_002
+2026-03-11,-245.00,Dental Checkup,healthcare,cc_001
+2026-03-12,-43.00,Shell Gas Station,transport,cc_001
+2026-03-13,-65.00,Dinner at Nobu,dining,cc_001
+2026-03-14,-500.00,Fidelity Roth IRA Contribution,retirement,chk_001
+2026-03-15,-200.00,Transfer to Marcus Savings,savings,chk_001
+2026-03-16,-32.00,CVS Pharmacy,healthcare,cc_002
+2026-03-17,-78.00,Costco,groceries,cc_002
+2026-03-18,-190.00,Geico Auto Insurance,insurance,chk_001
+2026-03-19,-25.00,Spotify Premium,subscriptions,cc_001
