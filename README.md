@@ -1,30 +1,59 @@
 # Midas
 
+> **Status: Early development (v0.1.0)** — core tools are working, CSV data source is fully supported, live Plaid integration is not yet implemented.
+
 A personal finance [MCP](https://modelcontextprotocol.io/) server that gives AI assistants real insight into your money. Ask Claude about your net worth, analyze your spending against popular budget frameworks, or review your brokerage performance — all from a simple chat.
 
 Built with [FastMCP](https://github.com/jlowin/fastmcp) and backed by plain CSV files.
 
 ---
 
-## What it does
+## MCP tools
 
 Midas exposes four tools over the Model Context Protocol:
 
-| Tool | What it answers |
-|---|---|
-| `get_net_worth` | Total assets minus liabilities, broken down by account |
-| `get_budget_breakdown` | How your spending stacks up against a budget model for any date range |
-| `list_budget_models` | All available budget frameworks with descriptions |
-| `get_brokerage_performance` | Holdings value, cost basis, gain/loss, and allocation per position |
+---
 
-### Budget models
+### `get_net_worth`
+Returns total assets minus total liabilities, broken down by account.
 
-Pick the framework that fits how you think about money:
+No parameters.
 
-- **50/30/20** — Needs / Wants / Savings (default)
-- **70/20/10** — Living expenses / Savings / Giving & debt
-- **80/20** — Pay yourself first: save 20%, spend the rest freely
-- **Zero-based** — Every dollar gets a job; per-category line items
+---
+
+### `get_budget_breakdown`
+Scores your spending against a budget model for a given date range.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `start_date` | `string` | all time | Start of date range (`YYYY-MM-DD`) |
+| `end_date` | `string` | all time | End of date range (`YYYY-MM-DD`) |
+| `model` | `string` | `50_30_20` | Budget model to apply (see below) |
+
+**Budget models:**
+
+| Key | Name | Description |
+|---|---|---|
+| `50_30_20` | 50/30/20 | 50% needs, 30% wants, 20% savings & debt (default) |
+| `70_20_10` | 70/20/10 | 70% living expenses, 20% savings, 10% giving & debt |
+| `80_20` | 80/20 | Save 20% off the top; spend the remaining 80% freely |
+| `zero_based` | Zero-based | Every dollar assigned; per-category line items |
+
+---
+
+### `list_budget_models`
+Returns all available budget models with their keys, names, and descriptions.
+
+No parameters.
+
+---
+
+### `get_brokerage_performance`
+Returns holdings value, cost basis, gain/loss, return percentage, and allocation for each position.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `account_id` | `string` | all accounts | Filter to a single investment account |
 
 ---
 
