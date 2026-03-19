@@ -4,12 +4,12 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-from .calculators.budget import calculate_budget_breakdown
-from .calculators.budget import list_budget_models as _list_budget_models
-from .calculators.budget_models import DEFAULT_MODEL
-from .calculators.net_worth import calculate_net_worth
-from .calculators.performance import calculate_brokerage_performance
-from .loaders.csv_loader import CSVLoader
+from src.calculators.budget import calculate_budget_breakdown
+from src.calculators.budget import list_budget_models as _list_budget_models
+from src.calculators.budget_models import DEFAULT_MODEL
+from src.calculators.net_worth import calculate_net_worth
+from src.calculators.performance import calculate_brokerage_performance
+from src.loaders.csv_loader import CSVLoader
 
 _DEFAULT_DATA = Path(__file__).parent.parent / "data" / "sample"
 DATA_DIR = Path(os.getenv("MIDAS_DATA_DIR", _DEFAULT_DATA))

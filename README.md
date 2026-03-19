@@ -72,7 +72,7 @@ midas
 Or without installing:
 
 ```bash
-python main.py
+python -m src.server
 ```
 
 The server starts and listens for MCP connections. Point your MCP client (e.g. Claude Desktop) at it.
