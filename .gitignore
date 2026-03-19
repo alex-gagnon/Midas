@@ -16,7 +16,7 @@ build/
 !.env.example
 
 # Tools
-.claude/
+.claude/outputs/
 
 # Data — ignore real financial data, only sample data is tracked
 data/*
