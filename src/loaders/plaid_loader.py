@@ -10,10 +10,10 @@ Required env vars when implemented:
 Install extra dep when wiring up:  plaid-python>=20.0.0
 """
 
-from .base import BaseLoader
 from ..models.account import Account
 from ..models.holding import Holding
 from ..models.transaction import Transaction
+from .base import BaseLoader
 
 
 class PlaidLoader(BaseLoader):

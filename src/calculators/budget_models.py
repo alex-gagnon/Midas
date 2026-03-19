@@ -5,7 +5,7 @@ Each model specifies named buckets with category assignments and targets.
 The calculator is model-agnostic — add a new model here and it Just Works.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)

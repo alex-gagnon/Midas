@@ -72,7 +72,7 @@ midas
 Or without installing:
 
 ```bash
-python main.py
+python -m src.server
 ```
 
 The server starts and listens for MCP connections. Point your MCP client (e.g. Claude Desktop) at it.
@@ -105,6 +105,14 @@ Date format: `YYYY-MM-DD`
 ```
 account_id, symbol, name, shares, cost_basis_per_share, current_price
 ```
+
+---
+
+## Security
+
+- **Claude Desktop** uses the stdio transport — all communication stays on your local machine; there is no network exposure.
+- **`mcp dev`** uses an HTTP proxy with an access token. Only run it locally (loopback interface). Never bind `mcp dev` to a non-loopback interface when using real financial data.
+- When `MIDAS_DATA_DIR` points to real (non-sample) data, tool argument logs in `logs/usage.jsonl` are automatically redacted — only date and model params are written in plain text. A startup warning is printed to stderr.
 
 ---
 

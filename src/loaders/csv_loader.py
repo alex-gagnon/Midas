@@ -2,10 +2,10 @@ import csv
 from datetime import date
 from pathlib import Path
 
-from .base import BaseLoader
 from ..models.account import Account, AccountType
 from ..models.holding import Holding
 from ..models.transaction import Transaction
+from .base import BaseLoader
 
 
 class CSVLoader(BaseLoader):
@@ -50,7 +50,10 @@ class CSVLoader(BaseLoader):
 
     def load_holdings(self) -> list[Holding]:
         holdings = []
-        with open(self.data_dir / "holdings.csv", newline="") as f:
+        path = self.data_dir / "holdings.csv"
+        if not path.exists():
+            return holdings
+        with open(path, newline="") as f:
             for row in csv.DictReader(f):
                 holdings.append(Holding(
                     account_id=row["account_id"],

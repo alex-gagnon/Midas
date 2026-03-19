@@ -1,8 +1,8 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 
 
-class AccountType(str, Enum):
+class AccountType(StrEnum):
     DEPOSITORY = "depository"
     CREDIT = "credit"
     INVESTMENT = "investment"

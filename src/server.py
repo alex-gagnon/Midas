@@ -2,23 +2,46 @@ import os
 from datetime import date
 from pathlib import Path
 
+_root = Path(__file__).parent.parent
+
+try:
+    from dotenv import load_dotenv
+    _env = os.getenv("MIDAS_ENV")
+    load_dotenv(_root / (f".env.{_env}" if _env else ".env"))
+except ImportError:
+    pass
+
 from mcp.server.fastmcp import FastMCP
 
-from .calculators.budget import calculate_budget_breakdown
-from .calculators.budget import list_budget_models as _list_budget_models
-from .calculators.budget_models import DEFAULT_MODEL
-from .calculators.net_worth import calculate_net_worth
-from .calculators.performance import calculate_brokerage_performance
-from .loaders.csv_loader import CSVLoader
+from src.calculators.budget import calculate_budget_breakdown
+from src.calculators.budget import list_budget_models as _list_budget_models
+from src.calculators.budget_models import DEFAULT_MODEL
+from src.calculators.debt_payoff import calculate_debt_payoff
+from src.calculators.net_worth import calculate_net_worth
+from src.calculators.performance import calculate_brokerage_performance
+from src.calculators.savings_rate import calculate_savings_rate
+from src.calculators.spending_trends import calculate_spending_trends
+from src.loaders.csv_loader import CSVLoader
+from src.usage_logger import log_tool_call
+from src.validators import (
+    validate_account_id,
+    validate_data_dir,
+    validate_date,
+    validate_model,
+)
 
-_DEFAULT_DATA = Path(__file__).parent.parent / "data" / "sample"
+_DEFAULT_DATA = _root / "data" / "sample"
 DATA_DIR = Path(os.getenv("MIDAS_DATA_DIR", _DEFAULT_DATA))
+if not DATA_DIR.is_absolute():
+    DATA_DIR = _root / DATA_DIR
+
+validate_data_dir(DATA_DIR)
 
 mcp = FastMCP(
     "midas",
     instructions=(
         "Personal finance assistant. Tools: get_net_worth, get_budget_breakdown, "
-        "get_brokerage_performance. Dates are YYYY-MM-DD."
+        "get_brokerage_performance, get_savings_rate, get_spending_trends. Dates are YYYY-MM-DD."
     ),
 )
 
@@ -28,6 +51,7 @@ def _loader() -> CSVLoader:
 
 
 @mcp.tool()
+@log_tool_call(DATA_DIR)
 def get_net_worth() -> dict:
     """Return current net worth: total assets minus total liabilities, broken down by account."""
     loader = _loader()
@@ -35,6 +59,7 @@ def get_net_worth() -> dict:
 
 
 @mcp.tool()
+@log_tool_call(DATA_DIR)
 def get_budget_breakdown(
     start_date: str | None = None,
     end_date: str | None = None,
@@ -51,6 +76,11 @@ def get_budget_breakdown(
 
     Omit dates to include all transactions.
     """
+    if start_date is not None:
+        validate_date(start_date)
+    if end_date is not None:
+        validate_date(end_date)
+    validate_model(model)
     loader = _loader()
     sd = date.fromisoformat(start_date) if start_date else None
     ed = date.fromisoformat(end_date) if end_date else None
@@ -58,22 +88,78 @@ def get_budget_breakdown(
 
 
 @mcp.tool()
+@log_tool_call(DATA_DIR)
 def list_budget_models() -> list[dict]:
     """List all available budget models with their keys, names, and descriptions."""
     return _list_budget_models()
 
 
 @mcp.tool()
+@log_tool_call(DATA_DIR)
 def get_brokerage_performance(account_id: str | None = None) -> dict:
     """
     Return brokerage holdings: value, cost basis, gain/loss, allocation per position.
     Pass account_id to filter to a single account; omit for all investment accounts.
     """
+    if account_id is not None:
+        validate_account_id(account_id)
     loader = _loader()
     return calculate_brokerage_performance(loader.load_holdings(), account_id)
 
 
+@mcp.tool()
+@log_tool_call(DATA_DIR)
+def get_savings_rate(
+    start_date: str | None = None,
+    end_date: str | None = None,
+) -> dict:
+    """Return savings rate for a date range: income vs. intentional savings (savings + retirement categories)."""
+    if start_date is not None:
+        validate_date(start_date)
+    if end_date is not None:
+        validate_date(end_date)
+    loader = _loader()
+    sd = date.fromisoformat(start_date) if start_date else None
+    ed = date.fromisoformat(end_date) if end_date else None
+    return calculate_savings_rate(loader.load_transactions(), sd, ed)
+
+
+@mcp.tool()
+@log_tool_call(DATA_DIR)
+def get_spending_trends(months: int = 6) -> dict:
+    """Return month-over-month spending trends for the last N months."""
+    loader = _loader()
+    return calculate_spending_trends(loader.load_transactions(), months)
+
+
+@mcp.tool()
+@log_tool_call(DATA_DIR)
+def get_debt_payoff_projection(
+    monthly_payment: float,
+    extra_payment: float = 0.0,
+) -> dict:
+    """
+    Project when all debts will be paid off and the total interest cost.
+
+    Uses the avalanche method (highest balance first as a proxy for rate,
+    since APR data is not stored in the schema). Assumes 20% APR for all debts.
+
+    monthly_payment — total monthly payment to distribute across all debts.
+    extra_payment   — optional one-time lump sum applied in month 1 to the
+                      highest-balance debt (default 0).
+    """
+    loader = _loader()
+    return calculate_debt_payoff(loader.load_accounts(), monthly_payment, extra_payment)
+
+
 def main() -> None:
+    from src.usage_logger import _is_sample
+    if not _is_sample(DATA_DIR):
+        import sys
+        print(
+            f"[midas] WARNING: running with real data at {DATA_DIR} — logs are redacted",
+            file=sys.stderr,
+        )
     mcp.run()
 
 

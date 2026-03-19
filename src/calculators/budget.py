@@ -1,7 +1,7 @@
 from datetime import date
 
 from ..models.transaction import Transaction
-from .budget_models import MODELS, DEFAULT_MODEL, BudgetModel
+from .budget_models import DEFAULT_MODEL, MODELS, BudgetModel
 
 
 def _classify(category: str, model: BudgetModel) -> str:
@@ -67,6 +67,7 @@ def calculate_budget_breakdown(
                 "category": cat,
                 "amount": round(amt, 2),
                 "pct_of_income": pct(amt),
+                "over_budget": pct(amt) > 15.0,
             }
             for cat, amt in sorted(categories.items(), key=lambda x: -x[1])
         ]

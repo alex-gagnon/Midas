@@ -14,11 +14,24 @@ build/
 .env
 .env.*
 !.env.example
+!.env.sample
 
 # Tools
-.claude/
+.claude/outputs/
+.claude/agent-memory/
+.claude/worktrees/
+.claude/settings.local.json
+.pytest_cache/
+.ruff_cache/
 
 # Data — ignore real financial data, only sample data is tracked
+# data/real/ is covered by data/* above — personal financial data must never be committed
 data/*
 !data/sample/
 !data/sample/**
+
+# Logging
+/logs/
+
+# Claude
+.claude/worktrees
