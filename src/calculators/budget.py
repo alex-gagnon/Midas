@@ -1,7 +1,7 @@
 from datetime import date
 
 from ..models.transaction import Transaction
-from .budget_models import MODELS, DEFAULT_MODEL, BudgetModel
+from .budget_models import DEFAULT_MODEL, MODELS, BudgetModel
 
 
 def _classify(category: str, model: BudgetModel) -> str:

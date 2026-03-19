@@ -17,8 +17,15 @@ build/
 
 # Tools
 .claude/outputs/
+.claude/agent-memory/
+.claude/settings.local.json
+.pytest_cache/
+.ruff_cache/
 
 # Data — ignore real financial data, only sample data is tracked
 data/*
 !data/sample/
 !data/sample/**
+
+# Logging
+/logs/

@@ -2,10 +2,10 @@ import csv
 from datetime import date
 from pathlib import Path
 
-from .base import BaseLoader
 from ..models.account import Account, AccountType
 from ..models.holding import Holding
 from ..models.transaction import Transaction
+from .base import BaseLoader
 
 
 class CSVLoader(BaseLoader):
