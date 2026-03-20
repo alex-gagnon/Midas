@@ -1,7 +1,7 @@
 from datetime import date
 
 from ..models.transaction import Transaction
-from .budget_models import MODELS, DEFAULT_MODEL, BudgetModel
+from .budget_models import DEFAULT_MODEL, MODELS, BudgetModel
 
 
 def _classify(category: str, model: BudgetModel) -> str:
@@ -39,9 +39,7 @@ def calculate_budget_breakdown(
         return True
 
     in_period = [t for t in transactions if in_range(t)]
-    total_income = sum(
-        t.amount for t in in_period if t.category == "income" and t.amount > 0
-    )
+    total_income = sum(t.amount for t in in_period if t.category == "income" and t.amount > 0)
 
     def pct(amount: float) -> float:
         return round(amount / total_income * 100, 1) if total_income > 0 else 0.0
@@ -67,6 +65,7 @@ def calculate_budget_breakdown(
                 "category": cat,
                 "amount": round(amt, 2),
                 "pct_of_income": pct(amt),
+                "over_budget": pct(amt) > 15.0,
             }
             for cat, amt in sorted(categories.items(), key=lambda x: -x[1])
         ]
@@ -128,7 +127,4 @@ def calculate_budget_breakdown(
 
 
 def list_budget_models() -> list[dict]:
-    return [
-        {"key": m.key, "name": m.name, "description": m.description}
-        for m in MODELS.values()
-    ]
+    return [{"key": m.key, "name": m.name, "description": m.description} for m in MODELS.values()]
