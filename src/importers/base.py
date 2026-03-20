@@ -23,6 +23,19 @@ HOLDING_HEADERS = [
 ]
 
 
+def clean_num(val: str) -> str:
+    """Strip currency formatting from a numeric string."""
+    return val.replace("$", "").replace(",", "").strip()
+
+
+def _find_header_row(rows: list[list[str]]) -> int:
+    """Return the index of the first row containing 'Symbol', fall back to 0."""
+    for i, row in enumerate(rows):
+        if any(cell.strip() == "Symbol" for cell in row):
+            return i
+    return 0
+
+
 def parse_date(s: str) -> str:
     """Return a YYYY-MM-DD string from MM/DD/YYYY, MM/DD/YY, or YYYY-MM-DD input.
 

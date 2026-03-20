@@ -28,3 +28,4 @@ Detailed reference lives in `.claude/context/`:
 ## Behavioral rules
 
 - Do NOT stage, commit, or run any git commands unless explicitly asked by the user.
+- Do NOT include sensitive data in any file — no institution names, account numbers, ticker symbols, balances, or any other PII. This applies to TODO.md, memory files, context files, comments, and anywhere else. Describe problems generically (e.g. "checking account loader" not the bank's name, "one loader omits cost basis" not the specific loader or symbols).
