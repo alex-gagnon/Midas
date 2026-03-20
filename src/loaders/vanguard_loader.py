@@ -220,4 +220,3 @@ class VanguardLoader(BaseLoader):
         not appear in budget or savings-rate calculations.
         """
         return []
-

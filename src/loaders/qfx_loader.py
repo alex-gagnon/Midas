@@ -140,7 +140,9 @@ class QFXLoader(BaseLoader):
                 # Bank transactions use .date; investment transactions use .tradeDate.
                 txn_date = getattr(txn, "date", None) or getattr(txn, "tradeDate", None)
                 if txn_date is None:
-                    logger.warning("Transaction %s in %s has no date; skipping", getattr(txn, "id", "?"), path)
+                    logger.warning(
+                        "Transaction %s in %s has no date; skipping", getattr(txn, "id", "?"), path
+                    )
                     continue
                 if hasattr(txn_date, "date"):
                     txn_date = txn_date.date()
