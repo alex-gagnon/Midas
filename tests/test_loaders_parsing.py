@@ -1,7 +1,6 @@
 """Unit tests for src/loaders/parsing.py."""
 
 import pytest
-
 from src.loaders.parsing import parse_dollar, parse_float
 
 
