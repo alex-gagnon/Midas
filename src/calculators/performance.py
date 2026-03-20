@@ -15,18 +15,22 @@ def calculate_brokerage_performance(
 
     positions = []
     for h in holdings:
-        positions.append({
-            "symbol": h.symbol,
-            "name": h.name,
-            "account_id": h.account_id,
-            "shares": h.shares,
-            "current_price": round(h.current_price, 2),
-            "current_value": round(h.current_value, 2),
-            "cost_basis": round(h.cost_basis, 2),
-            "gain_loss": round(h.gain_loss, 2),
-            "gain_loss_pct": round(h.gain_loss_pct, 2),
-            "allocation_pct": round(h.current_value / total_value * 100, 1) if total_value > 0 else 0.0,
-        })
+        positions.append(
+            {
+                "symbol": h.symbol,
+                "name": h.name,
+                "account_id": h.account_id,
+                "shares": h.shares,
+                "current_price": round(h.current_price, 2),
+                "current_value": round(h.current_value, 2),
+                "cost_basis": round(h.cost_basis, 2),
+                "gain_loss": round(h.gain_loss, 2),
+                "gain_loss_pct": round(h.gain_loss_pct, 2),
+                "allocation_pct": round(h.current_value / total_value * 100, 1)
+                if total_value > 0
+                else 0.0,
+            }
+        )
 
     positions.sort(key=lambda p: p["current_value"], reverse=True)
 

@@ -23,7 +23,13 @@ def _holding(account_id, symbol, shares, cost, price):
 class TestNetWorthReturnShape:
     def test_keys_present(self):
         result = calculate_net_worth([], [])
-        assert set(result.keys()) == {"net_worth", "total_assets", "total_liabilities", "assets", "liabilities"}
+        assert set(result.keys()) == {
+            "net_worth",
+            "total_assets",
+            "total_liabilities",
+            "assets",
+            "liabilities",
+        }
 
     def test_empty_inputs_all_zero(self):
         result = calculate_net_worth([], [])
@@ -74,8 +80,8 @@ class TestAssetClassification:
     def test_investment_account_sums_multiple_holdings(self):
         accounts = [_account("inv_001", "Brokerage", AccountType.INVESTMENT, 0.0)]
         holdings = [
-            _holding("inv_001", "VTI", 10.0, 200.0, 250.0),   # 2500
-            _holding("inv_001", "BND", 20.0, 80.0, 75.0),     # 1500
+            _holding("inv_001", "VTI", 10.0, 200.0, 250.0),  # 2500
+            _holding("inv_001", "BND", 20.0, 80.0, 75.0),  # 1500
         ]
         result = calculate_net_worth(accounts, holdings)
         assert result["assets"]["Brokerage"] == pytest.approx(4_000.0)
@@ -156,6 +162,7 @@ class TestNetWorthArithmetic:
 class TestNetWorthWithSampleData:
     def test_investment_accounts_use_holdings_not_zero_balance(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         accounts = loader.load_accounts()
         holdings = loader.load_holdings()
@@ -167,6 +174,7 @@ class TestNetWorthWithSampleData:
 
     def test_depository_accounts_use_balance(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         accounts = loader.load_accounts()
         holdings = loader.load_holdings()
@@ -177,6 +185,7 @@ class TestNetWorthWithSampleData:
 
     def test_liabilities_are_positive_amounts(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         accounts = loader.load_accounts()
         result = calculate_net_worth(accounts, [])
@@ -187,6 +196,7 @@ class TestNetWorthWithSampleData:
 
     def test_net_worth_is_positive_for_sample_data(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         accounts = loader.load_accounts()
         holdings = loader.load_holdings()
@@ -196,6 +206,7 @@ class TestNetWorthWithSampleData:
 
     def test_net_worth_arithmetic_consistency(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         accounts = loader.load_accounts()
         holdings = loader.load_holdings()

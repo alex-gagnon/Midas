@@ -90,7 +90,12 @@ class TestLoadAccounts:
         loader = CSVLoader(d)
         accounts = loader.load_accounts()
         types = {a.type for a in accounts}
-        assert types == {AccountType.DEPOSITORY, AccountType.CREDIT, AccountType.INVESTMENT, AccountType.LOAN}
+        assert types == {
+            AccountType.DEPOSITORY,
+            AccountType.CREDIT,
+            AccountType.INVESTMENT,
+            AccountType.LOAN,
+        }
 
     def test_missing_file_raises(self, tmp_path):
         d = tmp_path / "empty"
@@ -270,10 +275,7 @@ class TestCSVLoaderWithSampleData:
 
     def test_sample_investment_accounts_have_zero_balance(self, sample_data_dir):
         loader = CSVLoader(sample_data_dir)
-        inv_accounts = [
-            a for a in loader.load_accounts()
-            if a.type == AccountType.INVESTMENT
-        ]
+        inv_accounts = [a for a in loader.load_accounts() if a.type == AccountType.INVESTMENT]
         for a in inv_accounts:
             assert a.balance == 0.0, f"{a.account_id} should have balance=0"
 

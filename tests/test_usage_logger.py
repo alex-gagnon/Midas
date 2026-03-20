@@ -20,22 +20,28 @@ from src.usage_logger import (
 
 
 class TestIsSample:
-    @pytest.mark.parametrize("path", [
-        Path("data/sample"),
-        Path("/home/user/data/sample/"),
-        Path("C:/Users/Alex/projects/midas/data/sample"),
-        Path("data/SAMPLE"),    # case-insensitive
-        Path("my_sample_data"),
-    ])
+    @pytest.mark.parametrize(
+        "path",
+        [
+            Path("data/sample"),
+            Path("/home/user/data/sample/"),
+            Path("C:/Users/Alex/projects/midas/data/sample"),
+            Path("data/SAMPLE"),  # case-insensitive
+            Path("my_sample_data"),
+        ],
+    )
     def test_sample_paths_return_true(self, path):
         assert _is_sample(path) is True
 
-    @pytest.mark.parametrize("path", [
-        Path("data/real"),
-        Path("/home/user/finances"),
-        Path("data/production"),
-        Path("data/"),
-    ])
+    @pytest.mark.parametrize(
+        "path",
+        [
+            Path("data/real"),
+            Path("/home/user/finances"),
+            Path("data/production"),
+            Path("data/"),
+        ],
+    )
     def test_non_sample_paths_return_false(self, path):
         assert _is_sample(path) is False
 
@@ -46,23 +52,29 @@ class TestIsSample:
 
 
 class TestRedact:
-    @pytest.mark.parametrize("value", [
-        "hello",
-        42,
-        3.14,
-        True,
-        False,
-        None,
-    ])
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "hello",
+            42,
+            3.14,
+            True,
+            False,
+            None,
+        ],
+    )
     def test_scalars_pass_through(self, value):
         assert _redact(value) == value
 
-    @pytest.mark.parametrize("value", [
-        ["a", "list"],
-        {"a": "dict"},
-        ("a", "tuple"),
-        object(),
-    ])
+    @pytest.mark.parametrize(
+        "value",
+        [
+            ["a", "list"],
+            {"a": "dict"},
+            ("a", "tuple"),
+            object(),
+        ],
+    )
     def test_complex_values_redacted(self, value):
         assert _redact(value) == "<redacted>"
 
@@ -126,7 +138,9 @@ class TestSafeArgs:
         assert any_masked is False
 
     def test_kwargs_with_safe_params_in_real_data(self):
-        result, any_masked = _safe_args((), {"start_date": "2026-01-01", "model": "50_30_20"}, is_sample=False)
+        result, any_masked = _safe_args(
+            (), {"start_date": "2026-01-01", "model": "50_30_20"}, is_sample=False
+        )
         assert result["start_date"] == "2026-01-01"
         assert result["model"] == "50_30_20"
         assert any_masked is False
@@ -179,6 +193,7 @@ class TestLogToolCall:
         log_file = log_dir / "usage.jsonl"
 
         import src.usage_logger as ul
+
         monkeypatch.setattr(ul, "_LOG_DIR", log_dir)
         monkeypatch.setattr(ul, "_LOG_FILE", log_file)
 
@@ -203,6 +218,7 @@ class TestLogToolCall:
         log_file = log_dir / "usage.jsonl"
 
         import src.usage_logger as ul
+
         monkeypatch.setattr(ul, "_LOG_DIR", log_dir)
         monkeypatch.setattr(ul, "_LOG_FILE", log_file)
 
@@ -223,6 +239,7 @@ class TestLogToolCall:
         log_file = log_dir / "usage.jsonl"
 
         import src.usage_logger as ul
+
         monkeypatch.setattr(ul, "_LOG_DIR", log_dir)
         monkeypatch.setattr(ul, "_LOG_FILE", log_file)
 
@@ -239,6 +256,7 @@ class TestLogToolCall:
         log_file = log_dir / "usage.jsonl"
 
         import src.usage_logger as ul
+
         monkeypatch.setattr(ul, "_LOG_DIR", log_dir)
         monkeypatch.setattr(ul, "_LOG_FILE", log_file)
 
@@ -258,6 +276,7 @@ class TestLogToolCall:
         log_file = log_dir / "usage.jsonl"
 
         import src.usage_logger as ul
+
         monkeypatch.setattr(ul, "_LOG_DIR", log_dir)
         monkeypatch.setattr(ul, "_LOG_FILE", log_file)
 

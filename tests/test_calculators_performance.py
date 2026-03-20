@@ -23,8 +23,11 @@ class TestPerformanceReturnShape:
     def test_summary_keys(self):
         result = calculate_brokerage_performance([])
         assert set(result["summary"].keys()) == {
-            "total_value", "total_cost_basis", "total_gain_loss",
-            "total_return_pct", "position_count",
+            "total_value",
+            "total_cost_basis",
+            "total_gain_loss",
+            "total_return_pct",
+            "position_count",
         }
 
     def test_position_keys(self):
@@ -32,8 +35,15 @@ class TestPerformanceReturnShape:
         result = calculate_brokerage_performance(holdings)
         pos = result["positions"][0]
         assert set(pos.keys()) == {
-            "symbol", "name", "account_id", "shares", "current_price",
-            "current_value", "cost_basis", "gain_loss", "gain_loss_pct",
+            "symbol",
+            "name",
+            "account_id",
+            "shares",
+            "current_price",
+            "current_value",
+            "cost_basis",
+            "gain_loss",
+            "gain_loss_pct",
             "allocation_pct",
         }
 
@@ -111,7 +121,7 @@ class TestSummaryCalculations:
     def test_total_value(self):
         holdings = [
             _holding("inv", "A", 10.0, 100.0, 150.0),  # value=1500
-            _holding("inv", "B", 5.0, 200.0, 100.0),   # value=500
+            _holding("inv", "B", 5.0, 200.0, 100.0),  # value=500
         ]
         result = calculate_brokerage_performance(holdings)
         assert result["summary"]["total_value"] == pytest.approx(2_000.0)
@@ -119,7 +129,7 @@ class TestSummaryCalculations:
     def test_total_cost_basis(self):
         holdings = [
             _holding("inv", "A", 10.0, 100.0, 150.0),  # cost=1000
-            _holding("inv", "B", 5.0, 200.0, 100.0),   # cost=1000
+            _holding("inv", "B", 5.0, 200.0, 100.0),  # cost=1000
         ]
         result = calculate_brokerage_performance(holdings)
         assert result["summary"]["total_cost_basis"] == pytest.approx(2_000.0)
@@ -183,9 +193,9 @@ class TestPositionDetails:
 
     def test_allocation_pcts_sum_to_100(self):
         holdings = [
-            _holding("inv", "A", 10.0, 100.0, 200.0),   # value=2000
-            _holding("inv", "B", 5.0, 50.0, 200.0),     # value=1000
-            _holding("inv", "C", 2.0, 100.0, 500.0),    # value=1000
+            _holding("inv", "A", 10.0, 100.0, 200.0),  # value=2000
+            _holding("inv", "B", 5.0, 50.0, 200.0),  # value=1000
+            _holding("inv", "C", 2.0, 100.0, 500.0),  # value=1000
         ]
         result = calculate_brokerage_performance(holdings)
         total_alloc = sum(p["allocation_pct"] for p in result["positions"])
@@ -198,9 +208,9 @@ class TestPositionDetails:
 
     def test_positions_sorted_by_value_descending(self):
         holdings = [
-            _holding("inv", "SMALL", 1.0, 100.0, 100.0),    # value=100
+            _holding("inv", "SMALL", 1.0, 100.0, 100.0),  # value=100
             _holding("inv", "LARGE", 100.0, 100.0, 100.0),  # value=10000
-            _holding("inv", "MID", 10.0, 100.0, 100.0),     # value=1000
+            _holding("inv", "MID", 10.0, 100.0, 100.0),  # value=1000
         ]
         result = calculate_brokerage_performance(holdings)
         values = [p["current_value"] for p in result["positions"]]
@@ -215,6 +225,7 @@ class TestPositionDetails:
 class TestPerformanceWithSampleData:
     def test_all_holdings_loaded(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         holdings = loader.load_holdings()
         result = calculate_brokerage_performance(holdings)
@@ -222,6 +233,7 @@ class TestPerformanceWithSampleData:
 
     def test_inv_001_filter(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         holdings = loader.load_holdings()
         result = calculate_brokerage_performance(holdings, account_id="inv_001")
@@ -229,6 +241,7 @@ class TestPerformanceWithSampleData:
 
     def test_ira_001_filter(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         holdings = loader.load_holdings()
         result = calculate_brokerage_performance(holdings, account_id="ira_001")
@@ -236,6 +249,7 @@ class TestPerformanceWithSampleData:
 
     def test_allocation_pcts_sum_to_100_for_sample(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         holdings = loader.load_holdings()
         result = calculate_brokerage_performance(holdings)
@@ -244,6 +258,7 @@ class TestPerformanceWithSampleData:
 
     def test_positions_sorted_descending_for_sample(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         holdings = loader.load_holdings()
         result = calculate_brokerage_performance(holdings)
@@ -253,6 +268,7 @@ class TestPerformanceWithSampleData:
     def test_total_return_pct_is_non_zero(self, sample_data_dir):
         """Sample portfolio should show a real return, not accidentally zero."""
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         holdings = loader.load_holdings()
         result = calculate_brokerage_performance(holdings)

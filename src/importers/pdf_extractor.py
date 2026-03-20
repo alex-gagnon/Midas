@@ -26,6 +26,7 @@ except ImportError:
 # Institution detection helpers
 # ---------------------------------------------------------------------------
 
+
 def _detect_institution(header: list[str]) -> str | None:
     """Return a short institution key from a table header, or None if unknown."""
     normalized = {cell.strip().lower() for cell in header if cell}
@@ -43,6 +44,7 @@ def _detect_institution(header: list[str]) -> str | None:
 # ---------------------------------------------------------------------------
 # Row mappers — inline to avoid circular imports
 # ---------------------------------------------------------------------------
+
 
 def _map_chase_row(header: list[str], row: list[str], account_id: str) -> dict | None:
     """Map a Chase-style table row to a transaction dict."""
@@ -142,6 +144,7 @@ _MAPPER = {
 # Public API
 # ---------------------------------------------------------------------------
 
+
 def extract_transactions(
     pdf_path: str,
     account_id: str,
@@ -207,8 +210,7 @@ def extract_transactions(
                     mapped = mapper(header, row, account_id)
                     if mapped is None:
                         print(
-                            f"WARNING: page {page_num}, row {row_idx} — "
-                            f"could not parse: {row}",
+                            f"WARNING: page {page_num}, row {row_idx} — could not parse: {row}",
                             file=sys.stderr,
                         )
                         continue

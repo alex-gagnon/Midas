@@ -45,6 +45,7 @@ def _print_accounts_template(output_dir: str, account_id: str) -> None:
 # CLI
 # ---------------------------------------------------------------------------
 
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="import_data",
@@ -103,10 +104,7 @@ def main() -> None:
     # Warn the user if accounts.csv is missing — they will need it for Midas tools
     accounts_csv = output_dir / "accounts.csv"
     if not accounts_csv.exists():
-        print(
-            f"NOTE: {accounts_csv} does not exist yet. "
-            "Here is a starter template:\n"
-        )
+        print(f"NOTE: {accounts_csv} does not exist yet. Here is a starter template:\n")
         _print_accounts_template(str(output_dir), args.account_id)
 
     # Validate the input file exists
@@ -127,7 +125,7 @@ def main() -> None:
     except (ValueError, OSError) as exc:
         print(f"ERROR: {exc}", file=sys.stderr)
         sys.exit(1)
-    except ImportError as exc:
+    except ImportError:
         # pdfplumber not installed — message already printed by pdf_extractor
         sys.exit(1)
 

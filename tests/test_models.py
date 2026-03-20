@@ -97,35 +97,49 @@ class TestAccountCurrency:
 
 class TestHoldingCurrentValue:
     def test_basic(self):
-        h = Holding("inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0)
+        h = Holding(
+            "inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0
+        )
         assert h.current_value == pytest.approx(2_500.0)
 
     def test_fractional_shares(self):
-        h = Holding("inv", "VTI", "VTI ETF", shares=2.5, cost_basis_per_share=100.0, current_price=120.0)
+        h = Holding(
+            "inv", "VTI", "VTI ETF", shares=2.5, cost_basis_per_share=100.0, current_price=120.0
+        )
         assert h.current_value == pytest.approx(300.0)
 
     def test_zero_shares(self):
-        h = Holding("inv", "VTI", "VTI ETF", shares=0.0, cost_basis_per_share=200.0, current_price=250.0)
+        h = Holding(
+            "inv", "VTI", "VTI ETF", shares=0.0, cost_basis_per_share=200.0, current_price=250.0
+        )
         assert h.current_value == pytest.approx(0.0)
 
 
 class TestHoldingCostBasis:
     def test_basic(self):
-        h = Holding("inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0)
+        h = Holding(
+            "inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0
+        )
         assert h.cost_basis == pytest.approx(2_000.0)
 
     def test_fractional_shares(self):
-        h = Holding("inv", "VTI", "VTI ETF", shares=2.5, cost_basis_per_share=100.0, current_price=120.0)
+        h = Holding(
+            "inv", "VTI", "VTI ETF", shares=2.5, cost_basis_per_share=100.0, current_price=120.0
+        )
         assert h.cost_basis == pytest.approx(250.0)
 
 
 class TestHoldingGainLoss:
     def test_gain(self):
-        h = Holding("inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0)
+        h = Holding(
+            "inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0
+        )
         assert h.gain_loss == pytest.approx(500.0)
 
     def test_loss(self):
-        h = Holding("inv", "BND", "Bond ETF", shares=20.0, cost_basis_per_share=80.0, current_price=75.0)
+        h = Holding(
+            "inv", "BND", "Bond ETF", shares=20.0, cost_basis_per_share=80.0, current_price=75.0
+        )
         assert h.gain_loss == pytest.approx(-100.0)
 
     def test_breakeven(self):
@@ -135,12 +149,16 @@ class TestHoldingGainLoss:
 
 class TestHoldingGainLossPct:
     def test_gain_percentage(self):
-        h = Holding("inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0)
+        h = Holding(
+            "inv", "VTI", "VTI ETF", shares=10.0, cost_basis_per_share=200.0, current_price=250.0
+        )
         # gain = 500, cost = 2000, pct = 25.0
         assert h.gain_loss_pct == pytest.approx(25.0)
 
     def test_loss_percentage(self):
-        h = Holding("inv", "BND", "Bond ETF", shares=20.0, cost_basis_per_share=80.0, current_price=75.0)
+        h = Holding(
+            "inv", "BND", "Bond ETF", shares=20.0, cost_basis_per_share=80.0, current_price=75.0
+        )
         # gain = -100, cost = 1600, pct = -6.25
         assert h.gain_loss_pct == pytest.approx(-6.25)
 

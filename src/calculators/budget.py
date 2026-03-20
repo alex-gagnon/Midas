@@ -39,9 +39,7 @@ def calculate_budget_breakdown(
         return True
 
     in_period = [t for t in transactions if in_range(t)]
-    total_income = sum(
-        t.amount for t in in_period if t.category == "income" and t.amount > 0
-    )
+    total_income = sum(t.amount for t in in_period if t.category == "income" and t.amount > 0)
 
     def pct(amount: float) -> float:
         return round(amount / total_income * 100, 1) if total_income > 0 else 0.0
@@ -129,7 +127,4 @@ def calculate_budget_breakdown(
 
 
 def list_budget_models() -> list[dict]:
-    return [
-        {"key": m.key, "name": m.name, "description": m.description}
-        for m in MODELS.values()
-    ]
+    return [{"key": m.key, "name": m.name, "description": m.description} for m in MODELS.values()]

@@ -12,6 +12,7 @@ internally for all amortisation maths.
 """
 
 import datetime
+
 from ..models.account import Account, AccountType
 
 # Default annual percentage rate used when no per-account rate is available.
@@ -106,10 +107,9 @@ def calculate_debt_payoff(
     # --- Filter to debt accounts ---
     debt_subtypes = {"credit_card", "line_of_credit", "loan"}
     debt_accounts = [
-        a for a in accounts
-        if a.type == AccountType.CREDIT
-        or a.type == AccountType.LOAN
-        or a.subtype in debt_subtypes
+        a
+        for a in accounts
+        if a.type == AccountType.CREDIT or a.type == AccountType.LOAN or a.subtype in debt_subtypes
     ]
 
     if not debt_accounts:
@@ -127,9 +127,7 @@ def calculate_debt_payoff(
 
     # Build working list: (account, positive_balance)
     # Balances are stored as negative; abs() converts to owed amount.
-    debt_list = [
-        (a, abs(a.balance)) for a in debt_accounts if abs(a.balance) > 0
-    ]
+    debt_list = [(a, abs(a.balance)) for a in debt_accounts if abs(a.balance) > 0]
 
     if not debt_list:
         return {
@@ -176,15 +174,17 @@ def calculate_debt_payoff(
             start=today,
         )
 
-        results.append({
-            "account_id": account.account_id,
-            "name": account.name,
-            "balance": round(balance, 2),
-            "assumed_apr_pct": DEFAULT_APR_PCT,
-            "payoff_months": payoff_months,
-            "payoff_date": payoff_date,
-            "total_interest_paid": total_interest,
-        })
+        results.append(
+            {
+                "account_id": account.account_id,
+                "name": account.name,
+                "balance": round(balance, 2),
+                "assumed_apr_pct": DEFAULT_APR_PCT,
+                "payoff_months": payoff_months,
+                "payoff_date": payoff_date,
+                "total_interest_paid": total_interest,
+            }
+        )
 
     total_balance = round(sum(b for _, b in debt_list), 2)
     total_interest_paid = round(sum(r["total_interest_paid"] for r in results), 2)

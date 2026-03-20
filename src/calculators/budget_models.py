@@ -43,29 +43,50 @@ MODEL_50_30_20 = BudgetModel(
             label="Needs",
             target_pct=50,
             on_track_direction="lte",
-            categories=frozenset({
-                "housing", "utilities", "groceries", "insurance",
-                "healthcare", "transport", "childcare", "education",
-            }),
+            categories=frozenset(
+                {
+                    "housing",
+                    "utilities",
+                    "groceries",
+                    "insurance",
+                    "healthcare",
+                    "transport",
+                    "childcare",
+                    "education",
+                }
+            ),
         ),
         Bucket(
             name="wants",
             label="Wants",
             target_pct=30,
             on_track_direction="lte",
-            categories=frozenset({
-                "dining", "entertainment", "shopping", "travel",
-                "subscriptions", "personal_care", "gifts", "fitness",
-            }),
+            categories=frozenset(
+                {
+                    "dining",
+                    "entertainment",
+                    "shopping",
+                    "travel",
+                    "subscriptions",
+                    "personal_care",
+                    "gifts",
+                    "fitness",
+                }
+            ),
         ),
         Bucket(
             name="savings",
             label="Savings & Debt",
             target_pct=20,
             on_track_direction="gte",
-            categories=frozenset({
-                "savings", "investment", "retirement", "debt_payment",
-            }),
+            categories=frozenset(
+                {
+                    "savings",
+                    "investment",
+                    "retirement",
+                    "debt_payment",
+                }
+            ),
         ),
     ],
     default_bucket="wants",
@@ -84,30 +105,51 @@ MODEL_70_20_10 = BudgetModel(
             label="Living Expenses",
             target_pct=70,
             on_track_direction="lte",
-            categories=frozenset({
-                "housing", "utilities", "groceries", "insurance",
-                "healthcare", "transport", "childcare", "education",
-                "dining", "entertainment", "shopping", "travel",
-                "subscriptions", "personal_care", "fitness",
-            }),
+            categories=frozenset(
+                {
+                    "housing",
+                    "utilities",
+                    "groceries",
+                    "insurance",
+                    "healthcare",
+                    "transport",
+                    "childcare",
+                    "education",
+                    "dining",
+                    "entertainment",
+                    "shopping",
+                    "travel",
+                    "subscriptions",
+                    "personal_care",
+                    "fitness",
+                }
+            ),
         ),
         Bucket(
             name="savings",
             label="Savings & Investing",
             target_pct=20,
             on_track_direction="gte",
-            categories=frozenset({
-                "savings", "investment", "retirement",
-            }),
+            categories=frozenset(
+                {
+                    "savings",
+                    "investment",
+                    "retirement",
+                }
+            ),
         ),
         Bucket(
             name="giving_debt",
             label="Giving & Debt",
             target_pct=10,
             on_track_direction="lte",
-            categories=frozenset({
-                "gifts", "charity", "debt_payment",
-            }),
+            categories=frozenset(
+                {
+                    "gifts",
+                    "charity",
+                    "debt_payment",
+                }
+            ),
         ),
     ],
     default_bucket="living",
@@ -126,22 +168,41 @@ MODEL_80_20 = BudgetModel(
             label="Savings & Investing",
             target_pct=20,
             on_track_direction="gte",
-            categories=frozenset({
-                "savings", "investment", "retirement", "debt_payment",
-            }),
+            categories=frozenset(
+                {
+                    "savings",
+                    "investment",
+                    "retirement",
+                    "debt_payment",
+                }
+            ),
         ),
         Bucket(
             name="spending",
             label="Spending",
             target_pct=80,
             on_track_direction="lte",
-            categories=frozenset({
-                "housing", "utilities", "groceries", "insurance",
-                "healthcare", "transport", "childcare", "education",
-                "dining", "entertainment", "shopping", "travel",
-                "subscriptions", "personal_care", "gifts", "fitness",
-                "charity",
-            }),
+            categories=frozenset(
+                {
+                    "housing",
+                    "utilities",
+                    "groceries",
+                    "insurance",
+                    "healthcare",
+                    "transport",
+                    "childcare",
+                    "education",
+                    "dining",
+                    "entertainment",
+                    "shopping",
+                    "travel",
+                    "subscriptions",
+                    "personal_care",
+                    "gifts",
+                    "fitness",
+                    "charity",
+                }
+            ),
         ),
     ],
     default_bucket="spending",
@@ -158,15 +219,16 @@ MODEL_ZERO_BASED = BudgetModel(
         "Every dollar gets a job. Income minus all categorised spending should equal zero. "
         "Displays each category as its own line item."
     ),
-    buckets=[],          # calculator drives off raw transaction categories
-    default_bucket="",   # unused
+    buckets=[],  # calculator drives off raw transaction categories
+    default_bucket="",  # unused
 )
 
 # ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 MODELS: dict[str, BudgetModel] = {
-    m.key: m for m in [
+    m.key: m
+    for m in [
         MODEL_50_30_20,
         MODEL_70_20_10,
         MODEL_80_20,

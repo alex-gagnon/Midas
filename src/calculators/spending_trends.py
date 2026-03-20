@@ -30,11 +30,13 @@ def calculate_spending_trends(
             [{"category": cat, "amount": round(amt, 2)} for cat, amt in category_totals.items()],
             key=lambda x: -x["amount"],
         )[:5]
-        trend.append({
-            "month": f"{year}-{month:02d}",
-            "total_spent": round(total_spent, 2),
-            "top_categories": top_categories,
-        })
+        trend.append(
+            {
+                "month": f"{year}-{month:02d}",
+                "total_spent": round(total_spent, 2),
+                "top_categories": top_categories,
+            }
+        )
 
     return {
         "months_shown": len(trend),

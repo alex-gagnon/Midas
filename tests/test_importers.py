@@ -1,8 +1,6 @@
 """Unit and integration tests for src/importers/."""
 
 import csv
-import textwrap
-from io import StringIO
 from pathlib import Path
 
 import pytest
@@ -14,7 +12,6 @@ from src.importers.base import (
 )
 from src.importers.capital_one import CapitalOneImporter
 from src.importers.chase import ChaseImporter
-
 
 # ---------------------------------------------------------------------------
 # parse_date
@@ -70,12 +67,15 @@ class TestParseDate:
         with pytest.raises(ValueError):
             parse_date("20260319")
 
-    @pytest.mark.parametrize("date_input, expected", [
-        ("01/01/2000", "2000-01-01"),
-        ("12/31/2025", "2025-12-31"),
-        ("07/04/24", "2024-07-04"),
-        ("2024-07-04", "2024-07-04"),
-    ])
+    @pytest.mark.parametrize(
+        "date_input, expected",
+        [
+            ("01/01/2000", "2000-01-01"),
+            ("12/31/2025", "2025-12-31"),
+            ("07/04/24", "2024-07-04"),
+            ("2024-07-04", "2024-07-04"),
+        ],
+    )
     def test_parametrized_valid_formats(self, date_input, expected):
         assert parse_date(date_input) == expected
 
@@ -118,8 +118,8 @@ class TestWriteTransactions:
         dest = tmp_path / "transactions.csv"
         write_transactions(self._sample_rows(), str(dest), mode="overwrite")
         write_transactions(self._sample_rows(), str(dest), mode="append")
-        lines = [l for l in dest.read_text().splitlines() if l.strip()]
-        header_count = sum(1 for l in lines if l.startswith("date,"))
+        lines = [line for line in dest.read_text().splitlines() if line.strip()]
+        header_count = sum(1 for line in lines if line.startswith("date,"))
         assert header_count == 1
 
     def test_append_mode_adds_rows(self, tmp_path):
@@ -168,20 +168,14 @@ CHASE_HEADER = "Transaction Date,Post Date,Description,Category,Type,Amount,Memo
 
 class TestChaseImporter:
     def test_basic_transaction_imported(self, tmp_path):
-        content = (
-            CHASE_HEADER
-            + "03/01/2026,03/02/2026,Coffee Shop,Food & Drink,Sale,-4.50,\n"
-        )
+        content = CHASE_HEADER + "03/01/2026,03/02/2026,Coffee Shop,Food & Drink,Sale,-4.50,\n"
         src = _write_tmp_csv(tmp_path, "chase.csv", content)
         importer = ChaseImporter()
         n = importer.import_transactions(str(src), "chk_001", str(tmp_path))
         assert n == 1
 
     def test_date_converted_to_yyyy_mm_dd(self, tmp_path):
-        content = (
-            CHASE_HEADER
-            + "03/15/2026,03/16/2026,Salary,Income,ACH,3500.00,\n"
-        )
+        content = CHASE_HEADER + "03/15/2026,03/16/2026,Salary,Income,ACH,3500.00,\n"
         src = _write_tmp_csv(tmp_path, "chase.csv", content)
         importer = ChaseImporter()
         importer.import_transactions(str(src), "chk_001", str(tmp_path))
@@ -191,10 +185,7 @@ class TestChaseImporter:
         assert rows[0]["date"] == "2026-03-15"
 
     def test_negative_amount_passes_through(self, tmp_path):
-        content = (
-            CHASE_HEADER
-            + "03/01/2026,03/02/2026,Groceries,Shopping,Sale,-120.50,\n"
-        )
+        content = CHASE_HEADER + "03/01/2026,03/02/2026,Groceries,Shopping,Sale,-120.50,\n"
         src = _write_tmp_csv(tmp_path, "chase.csv", content)
         importer = ChaseImporter()
         importer.import_transactions(str(src), "chk_001", str(tmp_path))
@@ -204,10 +195,7 @@ class TestChaseImporter:
         assert rows[0]["amount"] == "-120.50"
 
     def test_positive_amount_passes_through(self, tmp_path):
-        content = (
-            CHASE_HEADER
-            + "03/15/2026,03/16/2026,Paycheck,Income,ACH,3500.00,\n"
-        )
+        content = CHASE_HEADER + "03/15/2026,03/16/2026,Paycheck,Income,ACH,3500.00,\n"
         src = _write_tmp_csv(tmp_path, "chase.csv", content)
         importer = ChaseImporter()
         importer.import_transactions(str(src), "chk_001", str(tmp_path))
@@ -217,10 +205,7 @@ class TestChaseImporter:
         assert rows[0]["amount"] == "3500.00"
 
     def test_account_id_written_to_output(self, tmp_path):
-        content = (
-            CHASE_HEADER
-            + "03/01/2026,03/02/2026,Coffee,Food & Drink,Sale,-4.50,\n"
-        )
+        content = CHASE_HEADER + "03/01/2026,03/02/2026,Coffee,Food & Drink,Sale,-4.50,\n"
         src = _write_tmp_csv(tmp_path, "chase.csv", content)
         importer = ChaseImporter()
         importer.import_transactions(str(src), "my_account_123", str(tmp_path))
@@ -258,7 +243,9 @@ class TestChaseImporter:
     def test_multiple_transactions_all_written(self, tmp_path):
         content = (
             CHASE_HEADER
-            + "03/01/2026,03/02/2026,Coffee,Food,-4.50,\n".replace("Food,-4.50,", "Food & Drink,Sale,-4.50,")
+            + "03/01/2026,03/02/2026,Coffee,Food,-4.50,\n".replace(
+                "Food,-4.50,", "Food & Drink,Sale,-4.50,"
+            )
             + "03/02/2026,03/03/2026,Groceries,Shopping,Sale,-75.00,\n"
             + "03/15/2026,03/16/2026,Paycheck,Income,ACH,3500.00,\n"
         )
@@ -268,10 +255,7 @@ class TestChaseImporter:
         assert n == 3
 
     def test_output_file_is_in_output_dir(self, tmp_path):
-        content = (
-            CHASE_HEADER
-            + "03/01/2026,03/02/2026,Coffee,Food & Drink,Sale,-4.50,\n"
-        )
+        content = CHASE_HEADER + "03/01/2026,03/02/2026,Coffee,Food & Drink,Sale,-4.50,\n"
         src = _write_tmp_csv(tmp_path, "chase.csv", content)
         out_dir = tmp_path / "output"
         out_dir.mkdir()
@@ -285,9 +269,7 @@ class TestChaseImporter:
 # ---------------------------------------------------------------------------
 
 
-CAP1_CC_HEADER = (
-    "Transaction Date,Posted Date,Card No.,Description,Category,Debit,Credit\n"
-)
+CAP1_CC_HEADER = "Transaction Date,Posted Date,Card No.,Description,Category,Debit,Credit\n"
 
 
 class TestCapitalOneImporterCreditCard:

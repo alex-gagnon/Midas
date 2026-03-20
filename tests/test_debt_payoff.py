@@ -5,14 +5,13 @@ import datetime
 import pytest
 
 from src.calculators.debt_payoff import (
-    DEFAULT_APR_PCT,
     _MAX_MONTHS,
+    DEFAULT_APR_PCT,
     _payoff_month_label,
     _simulate_debt,
     calculate_debt_payoff,
 )
 from src.models.account import Account, AccountType
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -236,8 +235,13 @@ class TestDebtPayoffSingleDebt:
         """A lump-sum extra_payment should reduce the number of months to payoff."""
         accounts = [_account("cc_001", -2_000.0)]
         result_no_extra = calculate_debt_payoff(accounts, monthly_payment=150.0, extra_payment=0.0)
-        result_with_extra = calculate_debt_payoff(accounts, monthly_payment=150.0, extra_payment=500.0)
-        assert result_with_extra["debts"][0]["payoff_months"] < result_no_extra["debts"][0]["payoff_months"]
+        result_with_extra = calculate_debt_payoff(
+            accounts, monthly_payment=150.0, extra_payment=500.0
+        )
+        assert (
+            result_with_extra["debts"][0]["payoff_months"]
+            < result_no_extra["debts"][0]["payoff_months"]
+        )
 
     def test_extra_payment_larger_than_balance_results_in_zero_months(self):
         accounts = [_account("cc_001", -1_000.0)]
@@ -302,9 +306,7 @@ class TestDebtPayoffMultipleDebts:
             _account("cc_big", -2_000.0),
             _account("cc_small", -800.0),
         ]
-        result = calculate_debt_payoff(
-            accounts, monthly_payment=200.0, extra_payment=2_000.0
-        )
+        result = calculate_debt_payoff(accounts, monthly_payment=200.0, extra_payment=2_000.0)
         big_debt = next(d for d in result["debts"] if d["account_id"] == "cc_big")
         small_debt = next(d for d in result["debts"] if d["account_id"] == "cc_small")
         assert big_debt["payoff_months"] == 0

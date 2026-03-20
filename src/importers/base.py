@@ -13,7 +13,14 @@ from pathlib import Path
 
 # Canonical column order for each output file
 TRANSACTION_HEADERS = ["date", "amount", "description", "category", "account_id"]
-HOLDING_HEADERS = ["account_id", "symbol", "name", "shares", "cost_basis_per_share", "current_price"]
+HOLDING_HEADERS = [
+    "account_id",
+    "symbol",
+    "name",
+    "shares",
+    "cost_basis_per_share",
+    "current_price",
+]
 
 
 def parse_date(s: str) -> str:

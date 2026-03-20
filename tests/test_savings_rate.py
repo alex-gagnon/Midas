@@ -33,7 +33,13 @@ STANDARD_TRANSACTIONS = [
 class TestSavingsRateShape:
     def test_returns_expected_top_level_keys(self):
         result = calculate_savings_rate(STANDARD_TRANSACTIONS)
-        assert set(result.keys()) == {"period", "income", "total_saved", "savings_rate_pct", "breakdown"}
+        assert set(result.keys()) == {
+            "period",
+            "income",
+            "total_saved",
+            "savings_rate_pct",
+            "breakdown",
+        }
 
     def test_period_is_none_when_no_dates_provided(self):
         result = calculate_savings_rate(STANDARD_TRANSACTIONS)
@@ -234,6 +240,7 @@ class TestSavingsRateBreakdown:
 class TestSavingsRateWithSampleData:
     def test_income_is_7000(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_savings_rate(txns)
@@ -241,6 +248,7 @@ class TestSavingsRateWithSampleData:
 
     def test_total_saved_is_700(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_savings_rate(txns)
@@ -248,6 +256,7 @@ class TestSavingsRateWithSampleData:
 
     def test_savings_rate_is_10_percent(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_savings_rate(txns)
@@ -255,6 +264,7 @@ class TestSavingsRateWithSampleData:
 
     def test_breakdown_contains_savings_and_retirement(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_savings_rate(txns)
@@ -263,6 +273,7 @@ class TestSavingsRateWithSampleData:
 
     def test_breakdown_savings_amount_is_200(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_savings_rate(txns)
@@ -270,6 +281,7 @@ class TestSavingsRateWithSampleData:
 
     def test_breakdown_retirement_amount_is_500(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_savings_rate(txns)

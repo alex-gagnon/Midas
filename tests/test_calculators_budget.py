@@ -43,13 +43,24 @@ class TestBudgetBreakdownShape:
     def test_percentage_model_keys(self):
         result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="50_30_20")
         assert set(result.keys()) == {
-            "model", "period", "income", "total_expenses", "remaining", "breakdown"
+            "model",
+            "period",
+            "income",
+            "total_expenses",
+            "remaining",
+            "breakdown",
         }
 
     def test_zero_based_model_keys(self):
         result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="zero_based")
         assert set(result.keys()) == {
-            "model", "period", "income", "total_expenses", "remaining", "on_track", "line_items"
+            "model",
+            "period",
+            "income",
+            "total_expenses",
+            "remaining",
+            "on_track",
+            "line_items",
         }
 
     def test_model_info_in_result(self):
@@ -84,7 +95,7 @@ class TestIncomeCalculation:
         # positive amount with non-income category should NOT be counted as income
         txns = [
             _txn("2026-03-01", 3_000.00, "income"),
-            _txn("2026-03-01", 1_000.00, "refund"),   # positive but not income
+            _txn("2026-03-01", 1_000.00, "refund"),  # positive but not income
         ]
         result = calculate_budget_breakdown(txns)
         assert result["income"] == pytest.approx(3_000.0)
@@ -110,7 +121,7 @@ class TestExpenseFiltering:
     def test_positive_non_income_transactions_excluded_from_expenses(self):
         txns = [
             _txn("2026-03-01", 3_000.00, "income"),
-            _txn("2026-03-05", 50.00, "refund"),     # positive, non-income → excluded
+            _txn("2026-03-05", 50.00, "refund"),  # positive, non-income → excluded
             _txn("2026-03-10", -200.00, "groceries"),
         ]
         result = calculate_budget_breakdown(txns)
@@ -134,9 +145,9 @@ class TestDateFiltering:
     def _mixed_date_txns(self):
         return [
             _txn("2026-02-01", 3_500.00, "income"),  # Feb
-            _txn("2026-02-10", -500.00, "housing"),   # Feb
+            _txn("2026-02-10", -500.00, "housing"),  # Feb
             _txn("2026-03-01", 3_500.00, "income"),  # Mar
-            _txn("2026-03-10", -800.00, "housing"),   # Mar
+            _txn("2026-03-10", -800.00, "housing"),  # Mar
         ]
 
     def test_start_date_excludes_earlier_transactions(self):
@@ -151,7 +162,9 @@ class TestDateFiltering:
 
     def test_both_dates_narrow_to_range(self):
         txns = self._mixed_date_txns()
-        result = calculate_budget_breakdown(txns, start_date=date(2026, 3, 1), end_date=date(2026, 3, 31))
+        result = calculate_budget_breakdown(
+            txns, start_date=date(2026, 3, 1), end_date=date(2026, 3, 31)
+        )
         assert result["income"] == pytest.approx(3_500.0)
         assert result["total_expenses"] == pytest.approx(800.0)
 
@@ -268,7 +281,7 @@ class TestModel50_30_20:
     def test_category_matching_is_case_insensitive(self):
         txns = [
             _txn("2026-03-01", 1_000.00, "income"),
-            _txn("2026-03-01", -300.00, "Housing"),   # capitalized
+            _txn("2026-03-01", -300.00, "Housing"),  # capitalized
         ]
         result = calculate_budget_breakdown(txns, model_key="50_30_20")
         assert result["breakdown"]["needs"]["amount"] == pytest.approx(300.0)
@@ -402,7 +415,7 @@ class TestModelZeroBased:
     def test_positive_non_income_amounts_excluded(self):
         txns = [
             _txn("2026-03-01", 1_000.00, "income"),
-            _txn("2026-03-10", 50.00, "refund"),    # positive non-income → skip
+            _txn("2026-03-10", 50.00, "refund"),  # positive non-income → skip
         ]
         result = calculate_budget_breakdown(txns, model_key="zero_based")
         categories = [li["category"] for li in result["line_items"]]
@@ -505,12 +518,15 @@ class TestZeroBasedOverBudgetFlag:
         for bucket in result["breakdown"].values():
             assert "over_budget" not in bucket
 
-    @pytest.mark.parametrize("spend,expected", [
-        (149.99, False),   # 14.999% → rounds to 15.0% → not over
-        (150.00, False),   # exactly 15.0% → not over
-        (151.00, True),    # 15.1% → over (first value that unambiguously rounds above 15.0)
-        (200.00, True),    # 20.0% → over
-    ])
+    @pytest.mark.parametrize(
+        "spend,expected",
+        [
+            (149.99, False),  # 14.999% → rounds to 15.0% → not over
+            (150.00, False),  # exactly 15.0% → not over
+            (151.00, True),  # 15.1% → over (first value that unambiguously rounds above 15.0)
+            (200.00, True),  # 20.0% → over
+        ],
+    )
     def test_boundary_parametrized(self, spend, expected):
         """Boundary cases around the 15% threshold with income=1000.
 
@@ -562,6 +578,7 @@ class TestListBudgetModels:
 class TestBudgetWithSampleData:
     def test_income_from_sample_is_7000(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_budget_breakdown(txns)
@@ -569,6 +586,7 @@ class TestBudgetWithSampleData:
 
     def test_all_buckets_have_non_negative_amounts(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_budget_breakdown(txns)
@@ -577,18 +595,18 @@ class TestBudgetWithSampleData:
 
     def test_actual_pct_sums_to_total_expense_pct(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_budget_breakdown(txns)
         total_expense_pct = round(result["total_expenses"] / result["income"] * 100, 1)
-        bucket_pct_sum = round(
-            sum(b["actual_pct"] for b in result["breakdown"].values()), 1
-        )
+        bucket_pct_sum = round(sum(b["actual_pct"] for b in result["breakdown"].values()), 1)
         assert bucket_pct_sum == pytest.approx(total_expense_pct, abs=0.2)  # rounding tolerance
 
     @pytest.mark.parametrize("model_key", ["50_30_20", "70_20_10", "80_20", "zero_based"])
     def test_all_models_run_without_error(self, sample_data_dir, model_key):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_budget_breakdown(txns, model_key=model_key)

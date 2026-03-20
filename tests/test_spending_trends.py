@@ -266,6 +266,7 @@ class TestSpendingTrendsTotalSpent:
 class TestSpendingTrendsWithSampleData:
     def test_sample_data_has_one_month(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_spending_trends(txns)
@@ -274,6 +275,7 @@ class TestSpendingTrendsWithSampleData:
 
     def test_sample_data_months_1_returns_march(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_spending_trends(txns, months=1)
@@ -282,6 +284,7 @@ class TestSpendingTrendsWithSampleData:
 
     def test_sample_data_savings_excluded_from_total(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_spending_trends(txns)
@@ -291,6 +294,7 @@ class TestSpendingTrendsWithSampleData:
 
     def test_sample_data_top_categories_capped_at_5(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_spending_trends(txns)
@@ -298,6 +302,7 @@ class TestSpendingTrendsWithSampleData:
 
     def test_sample_data_total_spent_is_positive(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
+
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_spending_trends(txns)

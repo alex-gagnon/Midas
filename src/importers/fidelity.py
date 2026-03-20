@@ -120,13 +120,15 @@ class FidelityImporter(InstitutionImporter):
                 )
                 continue
 
-            rows.append({
-                "date": date_str,
-                "amount": amount_raw,
-                "description": row.get("Description", "").strip(),
-                "category": row.get("Action", "").strip(),
-                "account_id": account_id,
-            })
+            rows.append(
+                {
+                    "date": date_str,
+                    "amount": amount_raw,
+                    "description": row.get("Description", "").strip(),
+                    "category": row.get("Action", "").strip(),
+                    "account_id": account_id,
+                }
+            )
 
         output_path = str(Path(output_dir) / "transactions.csv")
         return write_transactions(rows, output_path, mode)
@@ -167,14 +169,16 @@ class FidelityImporter(InstitutionImporter):
                 )
                 continue
 
-            rows.append({
-                "account_id": account_id,
-                "symbol": symbol,
-                "name": row.get("Description", "").strip(),
-                "shares": shares_raw,
-                "cost_basis_per_share": cost_raw,
-                "current_price": price_raw,
-            })
+            rows.append(
+                {
+                    "account_id": account_id,
+                    "symbol": symbol,
+                    "name": row.get("Description", "").strip(),
+                    "shares": shares_raw,
+                    "cost_basis_per_share": cost_raw,
+                    "current_price": price_raw,
+                }
+            )
 
         output_path = str(Path(output_dir) / "holdings.csv")
         return write_holdings(rows, output_path, mode)

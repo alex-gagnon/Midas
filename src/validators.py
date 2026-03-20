@@ -13,26 +13,20 @@ _ACCOUNT_ID_RE = re.compile(r"^[A-Za-z0-9_]+$")
 def validate_date(s: str) -> None:
     """Raise ValueError if *s* is not a valid YYYY-MM-DD date string."""
     if not _DATE_RE.match(s):
-        raise ValueError(
-            f"Invalid date {s!r} — expected format YYYY-MM-DD (e.g. '2024-01-31')"
-        )
+        raise ValueError(f"Invalid date {s!r} — expected format YYYY-MM-DD (e.g. '2024-01-31')")
     # Regex ensures the structural format; fromisoformat catches out-of-range
     # values such as month 13 or day 32.
     try:
         _date.fromisoformat(s)
     except ValueError:
-        raise ValueError(
-            f"Invalid date {s!r} — expected format YYYY-MM-DD (e.g. '2024-01-31')"
-        )
+        raise ValueError(f"Invalid date {s!r} — expected format YYYY-MM-DD (e.g. '2024-01-31')")
 
 
 def validate_model(key: str) -> None:
     """Raise ValueError if *key* is not a recognised budget model key."""
     if key not in MODELS:
         valid = ", ".join(sorted(MODELS))
-        raise ValueError(
-            f"Unknown budget model {key!r} — valid options are: {valid}"
-        )
+        raise ValueError(f"Unknown budget model {key!r} — valid options are: {valid}")
 
 
 def validate_data_dir(path: Path) -> None:

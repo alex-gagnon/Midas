@@ -68,13 +68,15 @@ class ChaseImporter(InstitutionImporter):
                     )
                     continue
 
-                rows.append({
-                    "date": date_str,
-                    "amount": amount_raw,
-                    "description": row["Description"].strip(),
-                    "category": row["Category"].strip(),
-                    "account_id": account_id,
-                })
+                rows.append(
+                    {
+                        "date": date_str,
+                        "amount": amount_raw,
+                        "description": row["Description"].strip(),
+                        "category": row["Category"].strip(),
+                        "account_id": account_id,
+                    }
+                )
 
         output_path = str(Path(output_dir) / "transactions.csv")
         return write_transactions(rows, output_path, mode)

@@ -2,15 +2,6 @@ import os
 from datetime import date
 from pathlib import Path
 
-_root = Path(__file__).parent.parent
-
-try:
-    from dotenv import load_dotenv
-    _env = os.getenv("MIDAS_ENV")
-    load_dotenv(_root / (f".env.{_env}" if _env else ".env"))
-except ImportError:
-    pass
-
 from mcp.server.fastmcp import FastMCP
 
 from src.calculators.budget import calculate_budget_breakdown
@@ -29,6 +20,16 @@ from src.validators import (
     validate_date,
     validate_model,
 )
+
+_root = Path(__file__).parent.parent
+
+try:
+    from dotenv import load_dotenv
+
+    _env = os.getenv("MIDAS_ENV")
+    load_dotenv(_root / (f".env.{_env}" if _env else ".env"))
+except ImportError:
+    pass
 
 _DEFAULT_DATA = _root / "data" / "sample"
 DATA_DIR = Path(os.getenv("MIDAS_DATA_DIR", _DEFAULT_DATA))
@@ -154,8 +155,10 @@ def get_debt_payoff_projection(
 
 def main() -> None:
     from src.usage_logger import _is_sample
+
     if not _is_sample(DATA_DIR):
         import sys
+
         print(
             f"[midas] WARNING: running with real data at {DATA_DIR} — logs are redacted",
             file=sys.stderr,

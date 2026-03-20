@@ -18,7 +18,12 @@ from pathlib import Path
 from .base import InstitutionImporter, parse_date, write_transactions
 
 _CREDIT_CARD_COLS = {"Transaction Date", "Description", "Debit", "Credit"}
-_SAVINGS_COLS = {"Transaction Date", "Transaction Description", "Transaction Type", "Transaction Amount"}
+_SAVINGS_COLS = {
+    "Transaction Date",
+    "Transaction Description",
+    "Transaction Type",
+    "Transaction Amount",
+}
 
 
 def _detect_format(fieldnames: list[str]) -> str:
@@ -28,9 +33,7 @@ def _detect_format(fieldnames: list[str]) -> str:
         return "credit_card"
     if _SAVINGS_COLS.issubset(cols):
         return "savings"
-    raise ValueError(
-        f"Unrecognised Capital One CSV format. Headers found: {fieldnames}"
-    )
+    raise ValueError(f"Unrecognised Capital One CSV format. Headers found: {fieldnames}")
 
 
 class CapitalOneImporter(InstitutionImporter):
@@ -100,13 +103,15 @@ class CapitalOneImporter(InstitutionImporter):
                     description = row["Transaction Description"].strip()
                     category = ""
 
-                rows.append({
-                    "date": date_str,
-                    "amount": str(amount),
-                    "description": description,
-                    "category": category,
-                    "account_id": account_id,
-                })
+                rows.append(
+                    {
+                        "date": date_str,
+                        "amount": str(amount),
+                        "description": description,
+                        "category": category,
+                        "account_id": account_id,
+                    }
+                )
 
         output_path = str(Path(output_dir) / "transactions.csv")
         return write_transactions(rows, output_path, mode)

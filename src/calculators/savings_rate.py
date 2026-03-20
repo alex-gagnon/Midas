@@ -19,9 +19,7 @@ def calculate_savings_rate(
 
     in_period = [t for t in transactions if in_range(t)]
 
-    total_income = sum(
-        t.amount for t in in_period if t.category == "income" and t.amount > 0
-    )
+    total_income = sum(t.amount for t in in_period if t.category == "income" and t.amount > 0)
 
     breakdown: dict[str, float] = {}
     for t in in_period:
