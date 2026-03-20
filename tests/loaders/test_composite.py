@@ -10,7 +10,7 @@ from src.loaders.qfx_loader import QFXLoader
 from src.loaders.vanguard_loader import VanguardLoader
 
 # Fixture directories
-FIXTURES_DIR = Path(__file__).parent / "fixtures"
+FIXTURES_DIR = Path(__file__).parent.parent / "fixtures"
 FIDELITY_CSV = FIXTURES_DIR / "Portfolio_Positions_sample.csv"
 QFX_SAMPLE = FIXTURES_DIR / "sample.qfx"
 QFX_INVESTMENT = FIXTURES_DIR / "sample_investment.qfx"

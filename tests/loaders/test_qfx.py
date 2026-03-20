@@ -10,8 +10,8 @@ from src.loaders.qfx_loader import QFXLoader
 from src.models.account import AccountType
 
 # Path to the checked-in fixture files
-FIXTURE_QFX = Path(__file__).parent / "fixtures" / "sample.qfx"
-FIXTURE_INVESTMENT_QFX = Path(__file__).parent / "fixtures" / "sample_investment.qfx"
+FIXTURE_QFX = Path(__file__).parent.parent / "fixtures" / "sample.qfx"
+FIXTURE_INVESTMENT_QFX = Path(__file__).parent.parent / "fixtures" / "sample_investment.qfx"
 
 
 # ---------------------------------------------------------------------------

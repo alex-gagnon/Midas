@@ -9,7 +9,7 @@ from src.loaders.fidelity_loader import FidelityLoader
 from src.models.account import AccountType
 
 # Path to the checked-in fixture file (name must match Portfolio_Positions_*.csv glob)
-FIXTURE_CSV = Path(__file__).parent / "fixtures" / "Portfolio_Positions_sample.csv"
+FIXTURE_CSV = Path(__file__).parent.parent / "fixtures" / "Portfolio_Positions_sample.csv"
 
 
 # ---------------------------------------------------------------------------

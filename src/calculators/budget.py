@@ -1,3 +1,4 @@
+import calendar
 from datetime import date
 
 from ..models.transaction import Transaction
@@ -123,6 +124,59 @@ def calculate_budget_breakdown(
         "total_expenses": round(total_expenses, 2),
         "remaining": round(total_income - total_expenses, 2),
         "breakdown": breakdown,
+    }
+
+
+def calculate_monthly_budget_breakdown(
+    transactions: list[Transaction],
+    start_date: date | None = None,
+    end_date: date | None = None,
+    model_key: str = DEFAULT_MODEL,
+) -> dict:
+    """Return a budget breakdown split month-by-month over the given date range.
+
+    If start_date / end_date are omitted, defaults to the current calendar month.
+    Raises ValueError if start_date > end_date or if model_key is unknown.
+    """
+    if model_key not in MODELS:
+        raise ValueError(f"Unknown budget model '{model_key}'. Available: {list(MODELS)}")
+
+    today = date.today()
+    if start_date is None:
+        start_date = date(today.year, today.month, 1)
+    if end_date is None:
+        last_day = calendar.monthrange(today.year, today.month)[1]
+        end_date = date(today.year, today.month, last_day)
+
+    if start_date > end_date:
+        raise ValueError(
+            f"start_date ({start_date}) must not be after end_date ({end_date})"
+        )
+
+    # Build (year, month) tuples spanning the full range
+    months: list[tuple[int, int]] = []
+    year, month = start_date.year, start_date.month
+    while (year, month) <= (end_date.year, end_date.month):
+        months.append((year, month))
+        month += 1
+        if month > 12:
+            month = 1
+            year += 1
+
+    model = MODELS[model_key]
+    month_entries = []
+    for year, month in months:
+        month_start = date(year, month, 1)
+        month_end = date(year, month, calendar.monthrange(year, month)[1])
+        entry = calculate_budget_breakdown(transactions, month_start, month_end, model_key)
+        entry["month"] = f"{year}-{month:02d}"
+        entry.pop("model", None)
+        month_entries.append(entry)
+
+    return {
+        "model": {"key": model.key, "name": model.name, "description": model.description},
+        "months_count": len(month_entries),
+        "months": month_entries,
     }
 
 

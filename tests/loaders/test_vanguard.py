@@ -8,7 +8,7 @@ from src.loaders.base import BaseLoader
 from src.loaders.vanguard_loader import VanguardLoader
 from src.models.account import AccountType
 
-FIXTURE_CSV = Path(__file__).parent / "fixtures" / "sample_vanguard.csv"
+FIXTURE_CSV = Path(__file__).parent.parent / "fixtures" / "sample_vanguard.csv"
 
 
 # ---------------------------------------------------------------------------

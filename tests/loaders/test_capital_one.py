@@ -8,8 +8,8 @@ from src.loaders.base import BaseLoader
 from src.loaders.capital_one_loader import CapitalOneLoader, _parse_account_name
 from src.models.account import AccountType
 
-SAVINGS_FIXTURE = Path(__file__).parent / "fixtures" / "cap1_savings_sample.csv"
-CREDIT_FIXTURE = Path(__file__).parent / "fixtures" / "cap1_credit_sample.csv"
+SAVINGS_FIXTURE = Path(__file__).parent.parent / "fixtures" / "cap1_savings_sample.csv"
+CREDIT_FIXTURE = Path(__file__).parent.parent / "fixtures" / "cap1_credit_sample.csv"
 
 # Savings fixture content uses account 9999; first row balance = 12500.00.
 # Credit fixture content uses card 0000; row 1 debit $85.50, row 2 credit $25.00.

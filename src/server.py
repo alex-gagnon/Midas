@@ -1,10 +1,11 @@
+import calendar
 import os
 from datetime import date
 from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
-from src.calculators.budget import calculate_budget_breakdown
+from src.calculators.budget import calculate_monthly_budget_breakdown
 from src.calculators.budget import list_budget_models as _list_budget_models
 from src.calculators.budget_models import DEFAULT_MODEL
 from src.calculators.debt_payoff import calculate_debt_payoff
@@ -90,7 +91,7 @@ def get_budget_breakdown(
     model: str = DEFAULT_MODEL,
 ) -> dict:
     """
-    Return a budget breakdown for a date range (YYYY-MM-DD).
+    Return a month-by-month budget breakdown for a date range (YYYY-MM-DD).
 
     model options (use list_budget_models to see all):
       50_30_20   — Needs / Wants / Savings (default)
@@ -98,17 +99,28 @@ def get_budget_breakdown(
       80_20      — Pay yourself first: Save 20%, spend 80%
       zero_based — Every dollar assigned; shows per-category line items
 
-    Omit dates to include all transactions.
+    Omit dates to use the current calendar month. Results are returned month-by-month.
     """
     if start_date is not None:
         validate_date(start_date)
     if end_date is not None:
         validate_date(end_date)
     validate_model(model)
+
+    today = date.today()
+    if start_date is not None:
+        sd = date.fromisoformat(start_date)
+    else:
+        sd = date(today.year, today.month, 1)
+
+    if end_date is not None:
+        ed = date.fromisoformat(end_date)
+    else:
+        last_day = calendar.monthrange(today.year, today.month)[1]
+        ed = date(today.year, today.month, last_day)
+
     loader = _loader()
-    sd = date.fromisoformat(start_date) if start_date else None
-    ed = date.fromisoformat(end_date) if end_date else None
-    return calculate_budget_breakdown(loader.load_transactions(), sd, ed, model)
+    return calculate_monthly_budget_breakdown(loader.load_transactions(), sd, ed, model)
 
 
 @mcp.tool()
