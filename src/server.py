@@ -12,7 +12,13 @@ from src.calculators.net_worth import calculate_net_worth
 from src.calculators.performance import calculate_brokerage_performance
 from src.calculators.savings_rate import calculate_savings_rate
 from src.calculators.spending_trends import calculate_spending_trends
+from src.loaders.base import BaseLoader
+from src.loaders.capital_one_loader import CapitalOneLoader
+from src.loaders.composite_loader import CompositeLoader
 from src.loaders.csv_loader import CSVLoader
+from src.loaders.fidelity_loader import FidelityLoader
+from src.loaders.qfx_loader import QFXLoader
+from src.loaders.vanguard_loader import VanguardLoader
 from src.usage_logger import log_tool_call
 from src.validators import (
     validate_account_id,
@@ -36,7 +42,13 @@ DATA_DIR = Path(os.getenv("MIDAS_DATA_DIR", _DEFAULT_DATA))
 if not DATA_DIR.is_absolute():
     DATA_DIR = _root / DATA_DIR
 
-validate_data_dir(DATA_DIR)
+_data_root_env = os.getenv("MIDAS_DATA_ROOT")
+DATA_ROOT = Path(_data_root_env) if _data_root_env else None
+if DATA_ROOT and not DATA_ROOT.is_absolute():
+    DATA_ROOT = _root / DATA_ROOT
+
+if DATA_ROOT is None:
+    validate_data_dir(DATA_DIR)
 
 mcp = FastMCP(
     "midas",
@@ -47,7 +59,18 @@ mcp = FastMCP(
 )
 
 
-def _loader() -> CSVLoader:
+def _loader() -> BaseLoader:
+    if DATA_ROOT is not None:
+        loaders = []
+        if (DATA_ROOT / "capital one").exists():
+            loaders.append(CapitalOneLoader(DATA_ROOT / "capital one"))
+        if (DATA_ROOT / "adp").exists():
+            loaders.append(QFXLoader(DATA_ROOT / "adp"))
+        if (DATA_ROOT / "fidelity").exists():
+            loaders.append(FidelityLoader(DATA_ROOT / "fidelity"))
+        if (DATA_ROOT / "vanguard").exists():
+            loaders.append(VanguardLoader(DATA_ROOT / "vanguard"))
+        return CompositeLoader(loaders)
     return CSVLoader(DATA_DIR)
 
 

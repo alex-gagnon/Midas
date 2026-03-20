@@ -22,18 +22,8 @@ Set `MIDAS_DATA_DIR` to point at a custom data directory (defaults to `data/samp
 
 Detailed reference lives in `.claude/context/`:
 
-- [project-structure.md](.claude/context/project-structure.md) — directory layout and file purposes
-- [data-format.md](.claude/context/data-format.md) — CSV schemas and `MIDAS_DATA_DIR`
+- [data-format.md](.claude/context/data-format.md) — CSV schemas and data directory env vars
 - [development.md](.claude/context/development.md) — adding tools/loaders, dependencies, build config
-
-## Claude directory
-
-`.claude/` organizes AI-assisted development artifacts:
-
-- **commands/** — Custom `/slash-commands` as `.md` files
-- **context/** — Domain knowledge and reference material
-- **outputs/** — Reports, analyses, and other generated artifacts
-- **skills/** — Custom skill definitions for this project
 
 ## Behavioral rules
 

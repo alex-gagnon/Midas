@@ -1,0 +1,10 @@
+Account Number,Investment Name,Symbol,Shares,Share Price,Total Value,
+99999999,APPLE INC,AAPL,5.0,150.0,750.0,
+99999999,VANGUARD FEDERAL MONEY MARKET INVESTOR CL,VMFXX,10.0,1.0,10.0,
+
+
+Account Number,Trade Date,Settlement Date,Transaction Type,Transaction Description,Investment Name,Symbol,Shares,Share Price,Principal Amount,Commissions and Fees,Net Amount,Accrued Interest,Account Type,
+99999999,2025-01-31,2025-01-31,Dividend,Dividend Received,APPLE INC,AAPL,0.00000,1.0,2.50,0.0,2.50,0.0,CASH,
+99999999,2025-01-31,2025-01-31,Reinvestment,Dividend Reinvestment,APPLE INC,AAPL,0.01600,150.0,-2.50,0.0,-2.50,0.0,CASH,
+99999999,2025-02-13,2025-02-13,Contribution,Individual contribution,CASH,,0.00000,0.0,500.00,0.0,500.00,0.0,CASH,
+

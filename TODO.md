@@ -5,6 +5,7 @@
 - [ ] **New budget models** — add new budget model types to the budget calculator
 
 ## Backlog
+- [ ] Historical performance data
 - [ ] Implement Plaid loader as a live data source alternative to CSV *(requires secrets management above)*
 
 ## Done
