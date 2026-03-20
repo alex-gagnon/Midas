@@ -149,9 +149,7 @@ def calculate_monthly_budget_breakdown(
         end_date = date(today.year, today.month, last_day)
 
     if start_date > end_date:
-        raise ValueError(
-            f"start_date ({start_date}) must not be after end_date ({end_date})"
-        )
+        raise ValueError(f"start_date ({start_date}) must not be after end_date ({end_date})")
 
     # Build (year, month) tuples spanning the full range
     months: list[tuple[int, int]] = []
