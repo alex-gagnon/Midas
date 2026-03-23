@@ -92,32 +92,25 @@ def get_budget_breakdown(
 ) -> dict:
     """
     Return a month-by-month budget breakdown for a date range (YYYY-MM-DD).
+    Defaults to the current calendar month when dates are omitted. Results are returned month-by-month.
 
     model options (use list_budget_models to see all):
       50_30_20   — Needs / Wants / Savings (default)
       70_20_10   — Living / Savings / Giving & Debt
       80_20      — Pay yourself first: Save 20%, spend 80%
       zero_based — Every dollar assigned; shows per-category line items
-
-    Omit dates to use the current calendar month. Results are returned month-by-month.
     """
-    if start_date is not None:
-        validate_date(start_date)
-    if end_date is not None:
-        validate_date(end_date)
+    today = date.today()
+    if start_date is None:
+        start_date = today.replace(day=1).isoformat()
+    if end_date is None:
+        end_date = today.isoformat()
+    validate_date(start_date)
+    validate_date(end_date)
     validate_model(model)
 
-    today = date.today()
-    if start_date is not None:
-        sd = date.fromisoformat(start_date)
-    else:
-        sd = date(today.year, today.month, 1)
-
-    if end_date is not None:
-        ed = date.fromisoformat(end_date)
-    else:
-        last_day = calendar.monthrange(today.year, today.month)[1]
-        ed = date(today.year, today.month, last_day)
+    sd = date.fromisoformat(start_date)
+    ed = date.fromisoformat(end_date)
 
     loader = _loader()
     return calculate_monthly_budget_breakdown(loader.load_transactions(), sd, ed, model)
@@ -149,14 +142,17 @@ def get_savings_rate(
     start_date: str | None = None,
     end_date: str | None = None,
 ) -> dict:
-    """Return savings rate for a date range: income vs. intentional savings (savings + retirement categories)."""
-    if start_date is not None:
-        validate_date(start_date)
-    if end_date is not None:
-        validate_date(end_date)
+    """Return savings rate for a date range (YYYY-MM-DD): income vs. intentional savings (savings + retirement categories). Defaults to the current calendar month."""
+    today = date.today()
+    if start_date is None:
+        start_date = today.replace(day=1).isoformat()
+    if end_date is None:
+        end_date = today.isoformat()
+    validate_date(start_date)
+    validate_date(end_date)
     loader = _loader()
-    sd = date.fromisoformat(start_date) if start_date else None
-    ed = date.fromisoformat(end_date) if end_date else None
+    sd = date.fromisoformat(start_date)
+    ed = date.fromisoformat(end_date)
     return calculate_savings_rate(loader.load_transactions(), sd, ed)
 
 
