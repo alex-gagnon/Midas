@@ -8,6 +8,7 @@ These tests verify that:
 Calculation correctness is tested by the dedicated calculator test modules.
 """
 
+import os
 from pathlib import Path
 
 import pytest
@@ -15,23 +16,12 @@ import pytest
 # Locate the sample data directory used by all tools.
 _SAMPLE_DIR = Path(__file__).parent.parent / "data" / "sample"
 
-
-# ---------------------------------------------------------------------------
-# Module-level import with MIDAS_DATA_DIR pointed at sample data
-# ---------------------------------------------------------------------------
-# server.py reads MIDAS_DATA_DIR at import time, so we cannot use monkeypatch
-# here (that only works inside test functions).  Instead we import the module
-# after forcing the environment variable, then re-use the already-imported
-# module in every test.  Because pytest collects test modules before running
-# them, we use autouse session-scoped setup to guarantee the env is set before
-# the first import.
-
-import os
-
+# server.py reads MIDAS_DATA_DIR at import time, so set the env var before
+# importing it. monkeypatch only works inside test functions, so this must
+# happen at module level.
 os.environ.setdefault("MIDAS_DATA_DIR", str(_SAMPLE_DIR))
 
 import src.server as server  # noqa: E402  (must come after env setup)
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -72,15 +62,18 @@ class TestToolRegistration:
             f"Missing tools: {self._EXPECTED_TOOLS - registered}"
         )
 
-    @pytest.mark.parametrize("tool_name", [
-        "get_net_worth",
-        "get_budget_breakdown",
-        "list_budget_models",
-        "get_brokerage_performance",
-        "get_savings_rate",
-        "get_spending_trends",
-        "get_debt_payoff_projection",
-    ])
+    @pytest.mark.parametrize(
+        "tool_name",
+        [
+            "get_net_worth",
+            "get_budget_breakdown",
+            "list_budget_models",
+            "get_brokerage_performance",
+            "get_savings_rate",
+            "get_spending_trends",
+            "get_debt_payoff_projection",
+        ],
+    )
     def test_tool_is_callable(self, tool_name):
         assert hasattr(server, tool_name), f"{tool_name!r} not found on server module"
         assert callable(getattr(server, tool_name))
@@ -140,9 +133,7 @@ class TestGetNetWorthSmoke:
 class TestGetBudgetBreakdownSmoke:
     @pytest.fixture(scope="class")
     def result(self):
-        return server.get_budget_breakdown(
-            start_date="2026-03-01", end_date="2026-03-31"
-        )
+        return server.get_budget_breakdown(start_date="2026-03-01", end_date="2026-03-31")
 
     def test_returns_dict_with_defaults(self, result):
         assert isinstance(result, dict)
@@ -194,6 +185,7 @@ class TestListBudgetModelsSmoke:
 
     def test_default_model_is_present(self, result):
         from src.calculators.budget_models import DEFAULT_MODEL
+
         keys = {entry["key"] for entry in result}
         assert DEFAULT_MODEL in keys
 
@@ -248,9 +240,7 @@ class TestGetBrokeragePerformanceSmoke:
 class TestGetSavingsRateSmoke:
     @pytest.fixture(scope="class")
     def result(self):
-        return server.get_savings_rate(
-            start_date="2026-03-01", end_date="2026-03-31"
-        )
+        return server.get_savings_rate(start_date="2026-03-01", end_date="2026-03-31")
 
     def test_returns_dict(self, result):
         assert isinstance(result, dict)
@@ -363,8 +353,6 @@ class TestGetDebtPayoffProjectionSmoke:
         assert result["total_monthly_payment"] == pytest.approx(750.0)
 
     def test_extra_payment_accepted(self):
-        result = server.get_debt_payoff_projection(
-            monthly_payment=500.0, extra_payment=1000.0
-        )
+        result = server.get_debt_payoff_projection(monthly_payment=500.0, extra_payment=1000.0)
         assert isinstance(result, dict)
         assert "projected_debt_free_date" in result
