@@ -1,4 +1,23 @@
 date,amount,description,category,account_id
+2026-01-01,3500.00,Direct Deposit - ACME Corp,income,chk_001
+2026-01-15,3500.00,Direct Deposit - ACME Corp,income,chk_001
+2026-01-01,-1800.00,January Rent,housing,chk_001
+2026-01-02,-130.00,Con Edison Electric,utilities,chk_001
+2026-01-03,-92.40,Whole Foods Market,groceries,cc_001
+2026-01-05,-45.00,Dinner out,dining,cc_001
+2026-01-06,-52.00,Netflix + Spotify,subscriptions,cc_001
+2026-01-14,-500.00,Fidelity Roth IRA Contribution,retirement,chk_001
+2026-01-15,-200.00,Transfer to Marcus Savings,savings,chk_001
+2026-02-01,3500.00,Direct Deposit - ACME Corp,income,chk_001
+2026-02-15,3500.00,Direct Deposit - ACME Corp,income,chk_001
+2026-02-01,-1800.00,February Rent,housing,chk_001
+2026-02-02,-115.00,Con Edison Electric,utilities,chk_001
+2026-02-05,-108.75,Whole Foods Market,groceries,cc_001
+2026-02-08,-73.50,Amazon,shopping,cc_002
+2026-02-10,-120.00,Equinox Gym,fitness,cc_001
+2026-02-14,-95.00,Valentine's Day Dinner,dining,cc_001
+2026-02-14,-500.00,Fidelity Roth IRA Contribution,retirement,chk_001
+2026-02-15,-200.00,Transfer to Marcus Savings,savings,chk_001
 2026-03-01,3500.00,Direct Deposit - ACME Corp,income,chk_001
 2026-03-15,3500.00,Direct Deposit - ACME Corp,income,chk_001
 2026-03-01,-1800.00,March Rent,housing,chk_001

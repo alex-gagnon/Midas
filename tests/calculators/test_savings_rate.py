@@ -238,51 +238,39 @@ class TestSavingsRateBreakdown:
 
 
 class TestSavingsRateWithSampleData:
-    def test_income_is_7000(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
+    """Integration tests against sample data scoped to March 2026."""
 
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_savings_rate(txns)
+    MARCH_START = date(2026, 3, 1)
+    MARCH_END = date(2026, 3, 31)
+
+    def test_income_is_7000(self, sample_transactions):
+        result = calculate_savings_rate(sample_transactions, self.MARCH_START, self.MARCH_END)
         assert result["income"] == pytest.approx(7_000.0)
 
-    def test_total_saved_is_700(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_savings_rate(txns)
+    def test_total_saved_is_700(self, sample_transactions):
+        result = calculate_savings_rate(sample_transactions, self.MARCH_START, self.MARCH_END)
         assert result["total_saved"] == pytest.approx(700.0)
 
-    def test_savings_rate_is_10_percent(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_savings_rate(txns)
+    def test_savings_rate_is_10_percent(self, sample_transactions):
+        result = calculate_savings_rate(sample_transactions, self.MARCH_START, self.MARCH_END)
         assert result["savings_rate_pct"] == pytest.approx(10.0)
 
-    def test_breakdown_contains_savings_and_retirement(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_savings_rate(txns)
+    def test_breakdown_contains_savings_and_retirement(self, sample_transactions):
+        result = calculate_savings_rate(sample_transactions, self.MARCH_START, self.MARCH_END)
         assert "savings" in result["breakdown"]
         assert "retirement" in result["breakdown"]
 
-    def test_breakdown_savings_amount_is_200(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_savings_rate(txns)
+    def test_breakdown_savings_amount_is_200(self, sample_transactions):
+        result = calculate_savings_rate(sample_transactions, self.MARCH_START, self.MARCH_END)
         assert result["breakdown"]["savings"] == pytest.approx(200.0)
 
-    def test_breakdown_retirement_amount_is_500(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_savings_rate(txns)
+    def test_breakdown_retirement_amount_is_500(self, sample_transactions):
+        result = calculate_savings_rate(sample_transactions, self.MARCH_START, self.MARCH_END)
         assert result["breakdown"]["retirement"] == pytest.approx(500.0)
+
+    def test_unfiltered_aggregates_all_three_months(self, sample_transactions):
+        """No date filter → all three months → income = $21,000, saved = $2,100."""
+        result = calculate_savings_rate(sample_transactions)
+        assert result["income"] == pytest.approx(21_000.0)
+        assert result["total_saved"] == pytest.approx(2_100.0)
+        assert result["savings_rate_pct"] == pytest.approx(10.0)

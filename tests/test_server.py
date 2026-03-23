@@ -19,6 +19,7 @@ _SAMPLE_DIR = Path(__file__).parent.parent / "data" / "sample"
 # server.py reads MIDAS_DATA_DIR at import time, so set the env var before
 # importing it. monkeypatch only works inside test functions, so this must
 # happen at module level.
+
 os.environ.setdefault("MIDAS_DATA_DIR", str(_SAMPLE_DIR))
 
 import src.server as server  # noqa: E402  (must come after env setup)

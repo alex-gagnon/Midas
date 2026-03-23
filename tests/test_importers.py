@@ -14,8 +14,10 @@ from src.importers.base import (
 )
 from src.importers.capital_one import CapitalOneImporter
 from src.importers.chase import ChaseImporter
-from src.importers.fidelity import FidelityImporter, _detect_mode as fidelity_detect_mode
-from src.importers.vanguard import VanguardImporter, _detect_mode as vanguard_detect_mode
+from src.importers.fidelity import FidelityImporter
+from src.importers.fidelity import _detect_mode as fidelity_detect_mode
+from src.importers.vanguard import VanguardImporter
+from src.importers.vanguard import _detect_mode as vanguard_detect_mode
 
 # ---------------------------------------------------------------------------
 # parse_date
@@ -695,14 +697,20 @@ FIDELITY_TX_HEADER = "Run Date,Action,Symbol,Description,Type,Quantity,Price,Com
 
 class TestFidelityImporterTransactions:
     def test_basic_transaction_imported(self, tmp_path):
-        content = FIDELITY_TX_HEADER + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        content = (
+            FIDELITY_TX_HEADER
+            + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "fidelity_tx.csv", content)
         importer = FidelityImporter()
         n = importer.import_transactions(str(src), "inv_001", str(tmp_path))
         assert n == 1
 
     def test_date_converted_to_yyyy_mm_dd(self, tmp_path):
-        content = FIDELITY_TX_HEADER + "03/15/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        content = (
+            FIDELITY_TX_HEADER
+            + "03/15/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "fidelity_tx.csv", content)
         importer = FidelityImporter()
         importer.import_transactions(str(src), "inv_001", str(tmp_path))
@@ -712,7 +720,10 @@ class TestFidelityImporterTransactions:
         assert rows[0]["date"] == "2026-03-15"
 
     def test_amount_written_correctly(self, tmp_path):
-        content = FIDELITY_TX_HEADER + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        content = (
+            FIDELITY_TX_HEADER
+            + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "fidelity_tx.csv", content)
         importer = FidelityImporter()
         importer.import_transactions(str(src), "inv_001", str(tmp_path))
@@ -722,7 +733,10 @@ class TestFidelityImporterTransactions:
         assert rows[0]["amount"] == "-1500.00"
 
     def test_description_written_correctly(self, tmp_path):
-        content = FIDELITY_TX_HEADER + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        content = (
+            FIDELITY_TX_HEADER
+            + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "fidelity_tx.csv", content)
         importer = FidelityImporter()
         importer.import_transactions(str(src), "inv_001", str(tmp_path))
@@ -732,7 +746,10 @@ class TestFidelityImporterTransactions:
         assert rows[0]["description"] == "Apple Inc"
 
     def test_category_comes_from_action_column(self, tmp_path):
-        content = FIDELITY_TX_HEADER + "03/01/2026,DIVIDEND RECEIVED,AAPL,Apple Inc,Cash,0,0.00,0.00,50.00\n"
+        content = (
+            FIDELITY_TX_HEADER
+            + "03/01/2026,DIVIDEND RECEIVED,AAPL,Apple Inc,Cash,0,0.00,0.00,50.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "fidelity_tx.csv", content)
         importer = FidelityImporter()
         importer.import_transactions(str(src), "inv_001", str(tmp_path))
@@ -742,7 +759,10 @@ class TestFidelityImporterTransactions:
         assert rows[0]["category"] == "DIVIDEND RECEIVED"
 
     def test_account_id_written_to_output(self, tmp_path):
-        content = FIDELITY_TX_HEADER + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        content = (
+            FIDELITY_TX_HEADER
+            + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "fidelity_tx.csv", content)
         importer = FidelityImporter()
         importer.import_transactions(str(src), "fid_roth_ira", str(tmp_path))
@@ -799,7 +819,10 @@ class TestFidelityImporterTransactions:
 
 class TestFidelityImporterAuto:
     def test_auto_dispatches_to_transactions_when_run_date_present(self, tmp_path):
-        content = FIDELITY_TX_HEADER + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        content = (
+            FIDELITY_TX_HEADER
+            + "03/01/2026,YOU BOUGHT,AAPL,Apple Inc,Cash,10,150.00,0.00,-1500.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "fidelity_auto.csv", content)
         importer = FidelityImporter()
         n = importer.import_auto(str(src), "inv_001", str(tmp_path))
@@ -824,7 +847,10 @@ class TestFidelityImporterAuto:
 
 class TestVanguardDetectMode:
     def test_detects_transactions_mode(self):
-        assert vanguard_detect_mode(["Trade Date", "Transaction Description", "Net Amount"]) == "transactions"
+        assert (
+            vanguard_detect_mode(["Trade Date", "Transaction Description", "Net Amount"])
+            == "transactions"
+        )
 
     def test_detects_holdings_mode(self):
         assert vanguard_detect_mode(["Symbol", "Share Name", "Shares", "Share Price"]) == "holdings"
@@ -843,7 +869,9 @@ class TestVanguardDetectMode:
 # ---------------------------------------------------------------------------
 
 
-VANGUARD_HOLDINGS_HEADER = "Account Number,Account Name,Symbol,Share Name,Shares,Share Price,Total Value\n"
+VANGUARD_HOLDINGS_HEADER = (
+    "Account Number,Account Name,Symbol,Share Name,Shares,Share Price,Total Value\n"
+)
 
 
 class TestVanguardImporterHoldings:
@@ -921,7 +949,10 @@ class TestVanguardImporterHoldings:
         assert rows[0]["cost_basis_per_share"] == ""
 
     def test_share_name_column_used_as_name(self, tmp_path):
-        content = VANGUARD_HOLDINGS_HEADER + "99999999,Brokerage,VTI,Vanguard Total Stock Market ETF,42.5,261.45,11111.63\n"
+        content = (
+            VANGUARD_HOLDINGS_HEADER
+            + "99999999,Brokerage,VTI,Vanguard Total Stock Market ETF,42.5,261.45,11111.63\n"
+        )
         src = _write_tmp_csv(tmp_path, "vanguard_pos.csv", content)
         importer = VanguardImporter()
         importer.import_holdings(str(src), "vanguard_001", str(tmp_path))
@@ -932,8 +963,13 @@ class TestVanguardImporterHoldings:
 
     def test_investment_name_column_used_as_fallback_name(self, tmp_path):
         # Some Vanguard exports use "Investment Name" instead of "Share Name"
-        header = "Account Number,Account Name,Symbol,Investment Name,Shares,Share Price,Total Value\n"
-        content = header + "99999999,Brokerage,VTI,Vanguard Total (Investment Name),42.5,261.45,11111.63\n"
+        header = (
+            "Account Number,Account Name,Symbol,Investment Name,Shares,Share Price,Total Value\n"
+        )
+        content = (
+            header
+            + "99999999,Brokerage,VTI,Vanguard Total (Investment Name),42.5,261.45,11111.63\n"
+        )
         src = _write_tmp_csv(tmp_path, "vanguard_alt.csv", content)
         importer = VanguardImporter()
         importer.import_holdings(str(src), "vanguard_001", str(tmp_path))
@@ -1005,7 +1041,10 @@ class TestVanguardImporterTransactions:
         assert rows[0]["amount"] == "-752.50"
 
     def test_description_comes_from_transaction_description(self, tmp_path):
-        content = VANGUARD_TX_HEADER + "03/01/2026,Dividend Reinvestment,Vanguard Fund,VTI,0,0.00,25.00,25.00\n"
+        content = (
+            VANGUARD_TX_HEADER
+            + "03/01/2026,Dividend Reinvestment,Vanguard Fund,VTI,0,0.00,25.00,25.00\n"
+        )
         src = _write_tmp_csv(tmp_path, "vanguard_tx.csv", content)
         importer = VanguardImporter()
         importer.import_transactions(str(src), "vanguard_001", str(tmp_path))

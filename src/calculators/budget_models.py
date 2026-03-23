@@ -224,6 +224,151 @@ MODEL_ZERO_BASED = BudgetModel(
 )
 
 # ---------------------------------------------------------------------------
+# 60 / 20 / 20  (Aggressive savings variant)
+# ---------------------------------------------------------------------------
+MODEL_60_20_20 = BudgetModel(
+    key="60_20_20",
+    name="60/20/20",
+    description="60% needs, 20% wants, 20% savings — a more aggressive savings target than 50/30/20.",
+    buckets=[
+        Bucket(
+            name="needs",
+            label="Needs",
+            target_pct=60,
+            on_track_direction="lte",
+            categories=frozenset(
+                {
+                    "housing",
+                    "utilities",
+                    "groceries",
+                    "insurance",
+                    "healthcare",
+                    "transport",
+                    "childcare",
+                    "education",
+                }
+            ),
+        ),
+        Bucket(
+            name="wants",
+            label="Wants",
+            target_pct=20,
+            on_track_direction="lte",
+            categories=frozenset(
+                {
+                    "dining",
+                    "entertainment",
+                    "shopping",
+                    "travel",
+                    "subscriptions",
+                    "personal_care",
+                    "gifts",
+                    "fitness",
+                    "charity",
+                }
+            ),
+        ),
+        Bucket(
+            name="savings",
+            label="Savings & Debt",
+            target_pct=20,
+            on_track_direction="gte",
+            categories=frozenset(
+                {
+                    "savings",
+                    "investment",
+                    "retirement",
+                    "debt_payment",
+                }
+            ),
+        ),
+    ],
+    default_bucket="wants",
+)
+
+# ---------------------------------------------------------------------------
+# Kakeibo  (Japanese envelope method)
+# ---------------------------------------------------------------------------
+MODEL_KAKEIBO = BudgetModel(
+    key="kakeibo",
+    name="Kakeibo",
+    description=(
+        "Japanese mindful budgeting: survival (essentials), optional (lifestyle), "
+        "culture (growth), and extra (unexpected). Aim to save 10–35% of income."
+    ),
+    buckets=[
+        Bucket(
+            name="survival",
+            label="Survival",
+            target_pct=None,
+            on_track_direction=None,
+            categories=frozenset(
+                {
+                    "housing",
+                    "utilities",
+                    "groceries",
+                    "healthcare",
+                    "insurance",
+                    "transport",
+                    "childcare",
+                }
+            ),
+        ),
+        Bucket(
+            name="optional",
+            label="Optional",
+            target_pct=None,
+            on_track_direction=None,
+            categories=frozenset(
+                {
+                    "dining",
+                    "entertainment",
+                    "shopping",
+                    "travel",
+                    "subscriptions",
+                    "personal_care",
+                    "fitness",
+                }
+            ),
+        ),
+        Bucket(
+            name="culture",
+            label="Culture",
+            target_pct=None,
+            on_track_direction=None,
+            categories=frozenset(
+                {
+                    "education",
+                    "gifts",
+                    "charity",
+                }
+            ),
+        ),
+        Bucket(
+            name="extra",
+            label="Extra / Unexpected",
+            target_pct=None,
+            on_track_direction=None,
+            categories=frozenset({"debt_payment"}),
+        ),
+        Bucket(
+            name="savings",
+            label="Savings",
+            target_pct=None,
+            on_track_direction="gte",
+            categories=frozenset(
+                {
+                    "savings",
+                    "investment",
+                    "retirement",
+                }
+            ),
+        ),
+    ],
+    default_bucket="extra",
+)
+
+# ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 MODELS: dict[str, BudgetModel] = {
@@ -233,6 +378,8 @@ MODELS: dict[str, BudgetModel] = {
         MODEL_70_20_10,
         MODEL_80_20,
         MODEL_ZERO_BASED,
+        MODEL_60_20_20,
+        MODEL_KAKEIBO,
     ]
 }
 
