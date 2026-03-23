@@ -14,8 +14,10 @@ from src.importers.base import (
 )
 from src.importers.capital_one import CapitalOneImporter
 from src.importers.chase import ChaseImporter
-from src.importers.fidelity import FidelityImporter, _detect_mode as fidelity_detect_mode
-from src.importers.vanguard import VanguardImporter, _detect_mode as vanguard_detect_mode
+from src.importers.fidelity import FidelityImporter
+from src.importers.fidelity import _detect_mode as fidelity_detect_mode
+from src.importers.vanguard import VanguardImporter
+from src.importers.vanguard import _detect_mode as vanguard_detect_mode
 
 # ---------------------------------------------------------------------------
 # parse_date

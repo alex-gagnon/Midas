@@ -26,12 +26,11 @@ _SAMPLE_DIR = Path(__file__).parent.parent / "data" / "sample"
 # them, we use autouse session-scoped setup to guarantee the env is set before
 # the first import.
 
-import os
+import os  # noqa: E402
 
 os.environ.setdefault("MIDAS_DATA_DIR", str(_SAMPLE_DIR))
 
 import src.server as server  # noqa: E402  (must come after env setup)
-
 
 # ---------------------------------------------------------------------------
 # Helpers
