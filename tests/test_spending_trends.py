@@ -264,14 +264,17 @@ class TestSpendingTrendsTotalSpent:
 
 
 class TestSpendingTrendsWithSampleData:
-    def test_sample_data_has_one_month(self, sample_data_dir):
+    def test_sample_data_has_three_months(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader
 
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
         result = calculate_spending_trends(txns)
-        assert result["months_shown"] == 1
-        assert result["trend"][0]["month"] == "2026-03"
+        assert result["months_shown"] == 3
+        months = [entry["month"] for entry in result["trend"]]
+        assert "2026-01" in months
+        assert "2026-02" in months
+        assert "2026-03" in months
 
     def test_sample_data_months_1_returns_march(self, sample_data_dir):
         from src.loaders.csv_loader import CSVLoader

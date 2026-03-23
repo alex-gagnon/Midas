@@ -261,7 +261,7 @@ class TestCSVLoaderWithSampleData:
     def test_loads_all_sample_transactions(self, sample_data_dir):
         loader = CSVLoader(sample_data_dir)
         txns = loader.load_transactions()
-        assert len(txns) == 21
+        assert len(txns) == 40  # 3 months of sample data (Jan + Feb + Mar 2026)
 
     def test_loads_all_sample_holdings(self, sample_data_dir):
         loader = CSVLoader(sample_data_dir)
