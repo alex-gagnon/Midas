@@ -554,10 +554,10 @@ class TestListBudgetModels:
         models = list_budget_models()
         assert isinstance(models, list)
 
-    def test_all_four_models_present(self):
+    def test_all_six_models_present(self):
         models = list_budget_models()
         keys = {m["key"] for m in models}
-        assert keys == {"50_30_20", "70_20_10", "80_20", "zero_based"}
+        assert keys == {"50_30_20", "70_20_10", "80_20", "zero_based", "60_20_20", "kakeibo"}
 
     def test_each_model_has_required_fields(self):
         for m in list_budget_models():
@@ -603,7 +603,7 @@ class TestBudgetWithSampleData:
         bucket_pct_sum = round(sum(b["actual_pct"] for b in result["breakdown"].values()), 1)
         assert bucket_pct_sum == pytest.approx(total_expense_pct, abs=0.2)  # rounding tolerance
 
-    @pytest.mark.parametrize("model_key", ["50_30_20", "70_20_10", "80_20", "zero_based"])
+    @pytest.mark.parametrize("model_key", ["50_30_20", "70_20_10", "80_20", "zero_based", "60_20_20", "kakeibo"])
     def test_all_models_run_without_error(self, sample_data_dir, model_key):
         from src.loaders.csv_loader import CSVLoader
 
@@ -611,3 +611,385 @@ class TestBudgetWithSampleData:
         txns = loader.load_transactions()
         result = calculate_budget_breakdown(txns, model_key=model_key)
         assert result["income"] > 0
+
+
+# ---------------------------------------------------------------------------
+# Model registration: new models
+# ---------------------------------------------------------------------------
+
+
+class TestModelRegistration:
+    def test_60_20_20_registered_in_models(self):
+        assert "60_20_20" in MODELS
+
+    def test_kakeibo_registered_in_models(self):
+        assert "kakeibo" in MODELS
+
+    def test_60_20_20_model_key_matches_registry_key(self):
+        assert MODELS["60_20_20"].key == "60_20_20"
+
+    def test_kakeibo_model_key_matches_registry_key(self):
+        assert MODELS["kakeibo"].key == "kakeibo"
+
+
+# ---------------------------------------------------------------------------
+# 60/20/20 model — structure
+# ---------------------------------------------------------------------------
+
+
+class TestModel60_20_20Structure:
+    def test_bucket_names_are_needs_wants_savings(self):
+        model = MODELS["60_20_20"]
+        names = {b.name for b in model.buckets}
+        assert names == {"needs", "wants", "savings"}
+
+    def test_needs_target_pct_is_60(self):
+        model = MODELS["60_20_20"]
+        needs = next(b for b in model.buckets if b.name == "needs")
+        assert needs.target_pct == 60
+
+    def test_wants_target_pct_is_20(self):
+        model = MODELS["60_20_20"]
+        wants = next(b for b in model.buckets if b.name == "wants")
+        assert wants.target_pct == 20
+
+    def test_savings_target_pct_is_20(self):
+        model = MODELS["60_20_20"]
+        savings = next(b for b in model.buckets if b.name == "savings")
+        assert savings.target_pct == 20
+
+    def test_needs_on_track_direction_is_lte(self):
+        model = MODELS["60_20_20"]
+        needs = next(b for b in model.buckets if b.name == "needs")
+        assert needs.on_track_direction == "lte"
+
+    def test_wants_on_track_direction_is_lte(self):
+        model = MODELS["60_20_20"]
+        wants = next(b for b in model.buckets if b.name == "wants")
+        assert wants.on_track_direction == "lte"
+
+    def test_savings_on_track_direction_is_gte(self):
+        model = MODELS["60_20_20"]
+        savings = next(b for b in model.buckets if b.name == "savings")
+        assert savings.on_track_direction == "gte"
+
+
+# ---------------------------------------------------------------------------
+# 60/20/20 model — calculator behaviour
+# ---------------------------------------------------------------------------
+
+
+class TestModel60_20_20:
+    def test_bucket_names_present_in_result(self):
+        result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="60_20_20")
+        assert set(result["breakdown"].keys()) == {"needs", "wants", "savings"}
+
+    def test_housing_classified_in_needs(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -500.00, "housing"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["needs"]["amount"] == pytest.approx(500.0)
+
+    def test_dining_classified_in_wants(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -150.00, "dining"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["wants"]["amount"] == pytest.approx(150.0)
+
+    def test_retirement_classified_in_savings(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -200.00, "retirement"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["savings"]["amount"] == pytest.approx(200.0)
+
+    def test_target_pct_values_in_result(self):
+        result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="60_20_20")
+        assert result["breakdown"]["needs"]["target_pct"] == 60
+        assert result["breakdown"]["wants"]["target_pct"] == 20
+        assert result["breakdown"]["savings"]["target_pct"] == 20
+
+    def test_on_track_needs_when_at_exactly_60pct(self):
+        # income=1000, housing=600 → 60.0% → lte 60 → on_track=True
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -600.00, "housing"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["needs"]["on_track"] is True
+
+    def test_off_track_needs_when_above_60pct(self):
+        # income=1000, housing=700 → 70.0% → lte 60 → on_track=False
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -700.00, "housing"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["needs"]["on_track"] is False
+
+    def test_on_track_savings_when_meeting_20pct(self):
+        # income=1000, savings=200 → 20% → gte 20 → on_track=True
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -200.00, "savings"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["savings"]["on_track"] is True
+
+    def test_off_track_savings_when_below_20pct(self):
+        # income=1000, savings=100 → 10% → gte 20 → on_track=False
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -100.00, "savings"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["savings"]["on_track"] is False
+
+    def test_uncategorized_falls_into_wants(self):
+        # default_bucket for 60_20_20 is "wants"
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -75.00, "unknown_category"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["wants"]["amount"] == pytest.approx(75.0)
+
+    def test_actual_pct_calculation(self):
+        # income=2000, savings=600 → 30.0%
+        txns = [
+            _txn("2026-03-01", 2_000.00, "income"),
+            _txn("2026-03-01", -600.00, "savings"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["savings"]["actual_pct"] == pytest.approx(30.0)
+
+    def test_remaining_is_income_minus_expenses(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -600.00, "housing"),
+            _txn("2026-03-01", -100.00, "dining"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["remaining"] == pytest.approx(300.0)
+
+    def test_category_matching_is_case_insensitive(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -400.00, "HOUSING"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["needs"]["amount"] == pytest.approx(400.0)
+
+    @pytest.mark.parametrize(
+        "needs_spend,expected_on_track",
+        [
+            (550.0, True),   # 55% < 60% → on_track
+            (600.0, True),   # exactly 60% → on_track (lte is inclusive)
+            (601.0, False),  # 60.1% > 60% → off_track
+        ],
+    )
+    def test_needs_boundary_parametrized(self, needs_spend, expected_on_track):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -needs_spend, "housing"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="60_20_20")
+        assert result["breakdown"]["needs"]["on_track"] is expected_on_track
+
+
+# ---------------------------------------------------------------------------
+# Kakeibo model — structure
+# ---------------------------------------------------------------------------
+
+
+class TestModelKakeiboStructure:
+    def test_has_five_buckets(self):
+        model = MODELS["kakeibo"]
+        assert len(model.buckets) == 5
+
+    def test_bucket_names_are_correct(self):
+        model = MODELS["kakeibo"]
+        names = {b.name for b in model.buckets}
+        assert names == {"survival", "optional", "culture", "extra", "savings"}
+
+    def test_savings_bucket_on_track_direction_is_gte(self):
+        model = MODELS["kakeibo"]
+        savings = next(b for b in model.buckets if b.name == "savings")
+        assert savings.on_track_direction == "gte"
+
+    def test_non_savings_buckets_have_no_on_track_direction(self):
+        model = MODELS["kakeibo"]
+        non_savings = [b for b in model.buckets if b.name != "savings"]
+        for bucket in non_savings:
+            assert bucket.on_track_direction is None, (
+                f"Bucket '{bucket.name}' should have on_track_direction=None"
+            )
+
+    def test_all_buckets_have_no_target_pct(self):
+        # Kakeibo is purely informational — no numeric targets on any bucket
+        model = MODELS["kakeibo"]
+        for bucket in model.buckets:
+            assert bucket.target_pct is None, (
+                f"Bucket '{bucket.name}' should have target_pct=None"
+            )
+
+    def test_default_bucket_is_extra(self):
+        model = MODELS["kakeibo"]
+        assert model.default_bucket == "extra"
+
+
+# ---------------------------------------------------------------------------
+# Kakeibo model — calculator behaviour
+# ---------------------------------------------------------------------------
+
+
+class TestModelKakeibo:
+    def test_bucket_names_present_in_result(self):
+        result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")
+        assert set(result["breakdown"].keys()) == {
+            "survival", "optional", "culture", "extra", "savings"
+        }
+
+    def test_housing_classified_in_survival(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -800.00, "housing"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["survival"]["amount"] == pytest.approx(800.0)
+
+    def test_dining_classified_in_optional(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -120.00, "dining"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["optional"]["amount"] == pytest.approx(120.0)
+
+    def test_education_classified_in_culture(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -80.00, "education"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["culture"]["amount"] == pytest.approx(80.0)
+
+    def test_gifts_classified_in_culture(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -50.00, "gifts"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["culture"]["amount"] == pytest.approx(50.0)
+
+    def test_debt_payment_classified_in_extra(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -200.00, "debt_payment"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["extra"]["amount"] == pytest.approx(200.0)
+
+    def test_savings_classified_in_savings(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -150.00, "savings"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["savings"]["amount"] == pytest.approx(150.0)
+
+    def test_retirement_classified_in_savings(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -300.00, "retirement"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["savings"]["amount"] == pytest.approx(300.0)
+
+    def test_uncategorized_falls_into_extra(self):
+        # default_bucket for kakeibo is "extra"
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -60.00, "mystery_expense"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["extra"]["amount"] == pytest.approx(60.0)
+
+    def test_non_savings_buckets_have_no_on_track_key(self):
+        # target_pct=None on these buckets means the calculator omits "on_track"
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -400.00, "housing"),
+            _txn("2026-03-01", -100.00, "dining"),
+            _txn("2026-03-01", -50.00, "education"),
+            _txn("2026-03-01", -50.00, "debt_payment"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        for bucket_name in ("survival", "optional", "culture", "extra"):
+            assert "on_track" not in result["breakdown"][bucket_name], (
+                f"Bucket '{bucket_name}' should not have an on_track key "
+                "(target_pct is None, so no on_track assessment is possible)"
+            )
+
+    def test_savings_bucket_has_no_on_track_key_due_to_null_target_pct(self):
+        # savings has on_track_direction="gte" but target_pct=None.
+        # The calculator guards: if bucket.on_track_direction AND bucket.target_pct is not None.
+        # Since target_pct IS None, "on_track" is NOT emitted — this is intentional kakeibo
+        # behaviour (savings is aspirational/informational, not a hard numeric target).
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -200.00, "savings"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert "on_track" not in result["breakdown"]["savings"]
+
+    def test_target_pct_is_none_for_all_buckets_in_result(self):
+        result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")
+        for bucket_name, bucket in result["breakdown"].items():
+            assert bucket["target_pct"] is None, (
+                f"Bucket '{bucket_name}' should have target_pct=None in result"
+            )
+
+    def test_actual_pct_calculated_correctly(self):
+        # income=1000, housing=500 → 50.0%
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -500.00, "housing"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["breakdown"]["survival"]["actual_pct"] == pytest.approx(50.0)
+
+    def test_remaining_is_income_minus_expenses(self):
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -600.00, "housing"),
+            _txn("2026-03-01", -100.00, "dining"),
+            _txn("2026-03-01", -50.00, "savings"),
+        ]
+        result = calculate_budget_breakdown(txns, model_key="kakeibo")
+        assert result["remaining"] == pytest.approx(250.0)
+
+    def test_standard_transactions_income_and_expense_totals(self):
+        # STANDARD_TRANSACTIONS: income=7000, needs=2000, wants=150, savings=700
+        # In kakeibo: housing+groceries → survival, dining+shopping → optional, retirement+savings → savings
+        result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")
+        assert result["income"] == pytest.approx(7_000.0)
+        assert result["breakdown"]["survival"]["amount"] == pytest.approx(2_000.0)
+        assert result["breakdown"]["optional"]["amount"] == pytest.approx(150.0)
+        assert result["breakdown"]["savings"]["amount"] == pytest.approx(700.0)
+
+    def test_result_has_standard_top_level_keys(self):
+        result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")
+        assert set(result.keys()) == {
+            "model", "period", "income", "total_expenses", "remaining", "breakdown"
+        }
+
+    def test_model_info_in_result(self):
+        result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")
+        assert result["model"]["key"] == "kakeibo"
+        assert result["model"]["name"] == "Kakeibo"
