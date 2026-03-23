@@ -7,5 +7,20 @@
       "Bash",
       "Write"
     ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); cmd=$(echo \"$input\" | jq -r '.tool_input.command'); if echo \"$cmd\" | grep -q 'git push'; then cd /home/user/Midas && uv run ruff format . && uv run ruff check --fix . && uv run ruff check . || { echo '{\"continue\": false, \"stopReason\": \"ruff failed — fix lint/format errors before pushing\"}'; exit 2; }; fi",
+            "timeout": 60,
+            "statusMessage": "Running ruff before push..."
+          }
+        ]
+      }
+    ]
   }
 }

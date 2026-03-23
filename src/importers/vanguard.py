@@ -18,25 +18,20 @@ import csv
 import sys
 from pathlib import Path
 
-from .base import InstitutionImporter, parse_date, write_holdings, write_transactions
+from .base import (
+    InstitutionImporter,
+    _find_header_row,
+    clean_num,
+    parse_date,
+    write_holdings,
+    write_transactions,
+)
 
 _TRANSACTION_MARKER = "Trade Date"
 _POSITIONS_MARKER = "Symbol"
 
 # Symbols that represent summary/total rows — skip in holdings output
 _SKIP_SYMBOLS = {"", "Total", "--"}
-
-
-def _find_header_row(raw_rows: list[list[str]]) -> int:
-    """Return the index of the first row that looks like a CSV header.
-
-    Vanguard positions exports embed account info above the data table.
-    The real header is the first row that contains 'Symbol'.
-    """
-    for i, row in enumerate(raw_rows):
-        if any(cell.strip() == "Symbol" for cell in row):
-            return i
-    return 0
 
 
 def _detect_mode(fieldnames: list[str]) -> str:
@@ -153,9 +148,6 @@ class VanguardImporter(InstitutionImporter):
             # Skip rows that look like section headers or footers
             if not symbol or symbol.startswith("$"):
                 continue
-
-            def clean_num(val: str) -> str:
-                return val.replace("$", "").replace(",", "").strip()
 
             shares_raw = clean_num(row.get("Shares", ""))
             price_raw = clean_num(row.get("Share Price", ""))

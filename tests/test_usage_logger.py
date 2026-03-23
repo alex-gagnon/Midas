@@ -260,7 +260,7 @@ class TestLogToolCall:
         monkeypatch.setattr(ul, "_LOG_DIR", log_dir)
         monkeypatch.setattr(ul, "_LOG_FILE", log_file)
 
-        real_dir = Path("data/real")  # no "sample" in path
+        real_dir = Path("data/capital one")  # no "sample" in path
 
         @log_tool_call(real_dir)
         def tool_with_account(account_id=None):
@@ -280,7 +280,7 @@ class TestLogToolCall:
         monkeypatch.setattr(ul, "_LOG_DIR", log_dir)
         monkeypatch.setattr(ul, "_LOG_FILE", log_file)
 
-        real_dir = Path("data/real")
+        real_dir = Path("data/capital one")
 
         @log_tool_call(real_dir)
         def budget_tool(start_date=None, end_date=None, model="50_30_20"):

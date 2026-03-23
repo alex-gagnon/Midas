@@ -17,7 +17,14 @@ import csv
 import sys
 from pathlib import Path
 
-from .base import InstitutionImporter, parse_date, write_holdings, write_transactions
+from .base import (
+    InstitutionImporter,
+    _find_header_row,
+    clean_num,
+    parse_date,
+    write_holdings,
+    write_transactions,
+)
 
 # Columns that unambiguously identify each mode
 _TRANSACTION_MARKER = "Run Date"
@@ -38,19 +45,6 @@ def _detect_mode(fieldnames: list[str]) -> str:
         f"Cannot detect Fidelity export mode from headers: {fieldnames}. "
         "Expected 'Run Date' for transactions or 'Quantity'+'Last Price' for positions."
     )
-
-
-def _find_header_row(raw_rows: list[list[str]]) -> int:
-    """Return the index of the first row that looks like a CSV header.
-
-    Fidelity positions exports embed account info and disclaimers above the
-    actual data table.  The real header row is the first row containing
-    'Symbol' (case-sensitive).
-    """
-    for i, row in enumerate(raw_rows):
-        if any(cell.strip() == "Symbol" for cell in row):
-            return i
-    return 0  # fall back to first row if no 'Symbol' marker found
 
 
 class FidelityImporter(InstitutionImporter):
@@ -154,9 +148,6 @@ class FidelityImporter(InstitutionImporter):
                 continue
 
             # Strip any currency formatting from numeric fields
-            def clean_num(val: str) -> str:
-                return val.replace("$", "").replace(",", "").strip()
-
             shares_raw = clean_num(row.get("Quantity", ""))
             price_raw = clean_num(row.get("Last Price", ""))
             cost_raw = clean_num(row.get("Average Cost Basis", ""))

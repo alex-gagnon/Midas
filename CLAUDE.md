@@ -22,19 +22,10 @@ Set `MIDAS_DATA_DIR` to point at a custom data directory (defaults to `data/samp
 
 Detailed reference lives in `.claude/context/`:
 
-- [project-structure.md](.claude/context/project-structure.md) — directory layout and file purposes
-- [data-format.md](.claude/context/data-format.md) — CSV schemas and `MIDAS_DATA_DIR`
+- [data-format.md](.claude/context/data-format.md) — CSV schemas and data directory env vars
 - [development.md](.claude/context/development.md) — adding tools/loaders, dependencies, build config
-
-## Claude directory
-
-`.claude/` organizes AI-assisted development artifacts:
-
-- **commands/** — Custom `/slash-commands` as `.md` files
-- **context/** — Domain knowledge and reference material
-- **outputs/** — Reports, analyses, and other generated artifacts
-- **skills/** — Custom skill definitions for this project
 
 ## Behavioral rules
 
 - Do NOT stage, commit, or run any git commands unless explicitly asked by the user.
+- Do NOT include sensitive data in any file — no institution names, account numbers, ticker symbols, balances, or any other PII. This applies to TODO.md, memory files, context files, comments, and anywhere else. Describe problems generically (e.g. "checking account loader" not the bank's name, "one loader omits cost basis" not the specific loader or symbols).

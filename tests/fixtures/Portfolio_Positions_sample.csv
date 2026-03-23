@@ -1,0 +1,5 @@
+Account Number,Account Name,Symbol,Description,Quantity,Last Price,Last Price Change,Current Value,Today's Gain/Loss Dollar,Today's Gain/Loss Percent,Total Gain/Loss Dollar,Total Gain/Loss Percent,Percent Of Account,Cost Basis Total,Average Cost Basis,Type
+X99999999,Individual - TOD,SPAXX**,HELD IN MONEY MARKET,,,,$10.00,,,,,0.10%,,,Cash,
+X99999999,Individual - TOD,NVDA,NVIDIA CORPORATION COM,5,$150.00,+$1.00,$750.00,+$5.00,+0.67%,+$250.00,+50.00%,44.44%,$500.00,$100.00,Cash,
+X99999999,Individual - TOD,FSKAX,FIDELITY TOTAL MARKET INDEX FUND,10,$180.00,-$0.50,$1800.00,-$5.00,-0.28%,+$500.00,+38.46%,55.46%,$1300.00,$130.00,Cash,
+"The data and information in this spreadsheet is provided for informational purposes only.",,,,,,,,,,,,,,,,
