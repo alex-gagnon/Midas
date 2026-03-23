@@ -1,8 +1,6 @@
 # TODO
 
 ## Up next
-- [ ] **Debt payoff projections** — add calculator tool, natural continuation of savings rate / spending trends work
-- [ ] **New budget models** — add new budget model types to the budget calculator
 
 ## Backlog
 - [ ] Implement Plaid loader as a live data source alternative to CSV *(requires secrets management above)*
@@ -15,3 +13,5 @@
 - [x] **Add savings rate and spending trends calculator tools** — `get_savings_rate` and `get_spending_trends` implemented and tested
 - [x] **Linting** — ruff configured in `pyproject.toml`, violations fixed, `.ruff_cache/` gitignored
 - [x] **.claude tooling** — context, commands (`/lint`, `/test`), and agent definitions updated to reflect current project state
+- [x] **Debt payoff projections** — `get_debt_payoff_projection` tool implemented with avalanche method, tested
+- [x] **New budget models** — added `60_20_20` (aggressive savings) and `kakeibo` (Japanese envelope method) models
