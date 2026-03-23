@@ -20,3 +20,4 @@
 - [x] **.claude tooling** — context, commands (`/lint`, `/test`), and agent definitions updated to reflect current project state
 - [x] **Debt payoff projections** — `get_debt_payoff_projection` tool implemented with avalanche method, tested
 - [x] **New budget models** — added `60_20_20` (aggressive savings) and `kakeibo` (Japanese envelope method) models
+- [x] **Budget/savings default date range** — `get_budget_breakdown` and `get_savings_rate` now default to the current calendar month instead of all-time, preventing cross-period expense aggregation
