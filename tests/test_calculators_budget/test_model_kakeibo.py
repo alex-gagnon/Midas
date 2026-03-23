@@ -14,7 +14,11 @@ class TestModelKakeiboStructure:
 
     def test_bucket_names_are_correct(self):
         assert {b.name for b in MODELS["kakeibo"].buckets} == {
-            "survival", "optional", "culture", "extra", "savings"
+            "survival",
+            "optional",
+            "culture",
+            "extra",
+            "savings",
         }
 
     def test_savings_bucket_on_track_direction_is_gte(self):
@@ -30,9 +34,7 @@ class TestModelKakeiboStructure:
     def test_all_buckets_have_no_target_pct(self):
         # Kakeibo is purely informational — no numeric targets on any bucket
         for bucket in MODELS["kakeibo"].buckets:
-            assert bucket.target_pct is None, (
-                f"Bucket '{bucket.name}' should have target_pct=None"
-            )
+            assert bucket.target_pct is None, f"Bucket '{bucket.name}' should have target_pct=None"
 
     def test_default_bucket_is_extra(self):
         assert MODELS["kakeibo"].default_bucket == "extra"
@@ -41,7 +43,13 @@ class TestModelKakeiboStructure:
 class TestModelKakeibo:
     def test_bucket_names_present_in_result(self):
         result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")
-        assert set(result["breakdown"].keys()) == {"survival", "optional", "culture", "extra", "savings"}
+        assert set(result["breakdown"].keys()) == {
+            "survival",
+            "optional",
+            "culture",
+            "extra",
+            "savings",
+        }
 
     def test_housing_classified_in_survival(self):
         txns = [_txn("2026-03-01", 1_000.00, "income"), _txn("2026-03-01", -800.00, "housing")]
@@ -80,7 +88,10 @@ class TestModelKakeibo:
 
     def test_uncategorized_falls_into_extra(self):
         # default_bucket for kakeibo is "extra"
-        txns = [_txn("2026-03-01", 1_000.00, "income"), _txn("2026-03-01", -60.00, "mystery_expense")]
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -60.00, "mystery_expense"),
+        ]
         result = calculate_budget_breakdown(txns, model_key="kakeibo")
         assert result["breakdown"]["extra"]["amount"] == pytest.approx(60.0)
 
@@ -143,7 +154,14 @@ class TestModelKakeibo:
 
     def test_result_has_standard_top_level_keys(self):
         result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")
-        assert set(result.keys()) == {"model", "period", "income", "total_expenses", "remaining", "breakdown"}
+        assert set(result.keys()) == {
+            "model",
+            "period",
+            "income",
+            "total_expenses",
+            "remaining",
+            "breakdown",
+        }
 
     def test_model_info_in_result(self):
         result = calculate_budget_breakdown(STANDARD_TRANSACTIONS, model_key="kakeibo")

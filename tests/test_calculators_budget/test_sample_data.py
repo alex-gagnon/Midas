@@ -28,9 +28,13 @@ class TestBudgetWithSampleData:
         bucket_pct_sum = round(sum(b["actual_pct"] for b in result["breakdown"].values()), 1)
         assert bucket_pct_sum == pytest.approx(total_expense_pct, abs=0.2)  # rounding tolerance
 
-    @pytest.mark.parametrize("model_key", ["50_30_20", "70_20_10", "80_20", "zero_based", "60_20_20", "kakeibo"])
+    @pytest.mark.parametrize(
+        "model_key", ["50_30_20", "70_20_10", "80_20", "zero_based", "60_20_20", "kakeibo"]
+    )
     def test_all_models_run_without_error(self, sample_transactions, model_key):
-        result = calculate_budget_breakdown(sample_transactions, self.MARCH_START, self.MARCH_END, model_key=model_key)
+        result = calculate_budget_breakdown(
+            sample_transactions, self.MARCH_START, self.MARCH_END, model_key=model_key
+        )
         assert result["income"] > 0
 
 
@@ -47,7 +51,9 @@ class TestBudgetMultiMonthFiltering:
         assert result["income"] == pytest.approx(21_000.0)
 
     def test_march_filter_returns_only_march_income(self, sample_transactions):
-        result = calculate_budget_breakdown(sample_transactions, date(2026, 3, 1), date(2026, 3, 31))
+        result = calculate_budget_breakdown(
+            sample_transactions, date(2026, 3, 1), date(2026, 3, 31)
+        )
         assert result["income"] == pytest.approx(7_000.0)
 
     def test_march_expenses_lower_than_unfiltered(self, sample_transactions):

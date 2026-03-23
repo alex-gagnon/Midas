@@ -52,7 +52,10 @@ class TestModel50_30_20:
         assert result["breakdown"]["needs"]["on_track"] is False
 
     def test_uncategorized_falls_into_default_bucket(self):
-        txns = [_txn("2026-03-01", 1_000.00, "income"), _txn("2026-03-01", -100.00, "unknown_category")]
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -100.00, "unknown_category"),
+        ]
         result = calculate_budget_breakdown(txns, model_key="50_30_20")
         # default_bucket for 50_30_20 is "wants"
         assert result["breakdown"]["wants"]["amount"] == pytest.approx(100.0)

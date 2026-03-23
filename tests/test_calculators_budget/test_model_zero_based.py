@@ -135,8 +135,8 @@ class TestZeroBasedOverBudgetFlag:
         [
             (149.99, False),  # 14.999% → rounds to 15.0% → not over
             (150.00, False),  # exactly 15.0% → not over
-            (151.00, True),   # 15.1% → over (first value that unambiguously rounds above 15.0)
-            (200.00, True),   # 20.0% → over
+            (151.00, True),  # 15.1% → over (first value that unambiguously rounds above 15.0)
+            (200.00, True),  # 20.0% → over
         ],
     )
     def test_boundary_parametrized(self, spend, expected):

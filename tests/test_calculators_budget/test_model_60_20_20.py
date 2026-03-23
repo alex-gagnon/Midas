@@ -89,7 +89,10 @@ class TestModel60_20_20:
 
     def test_uncategorized_falls_into_wants(self):
         # default_bucket for 60_20_20 is "wants"
-        txns = [_txn("2026-03-01", 1_000.00, "income"), _txn("2026-03-01", -75.00, "unknown_category")]
+        txns = [
+            _txn("2026-03-01", 1_000.00, "income"),
+            _txn("2026-03-01", -75.00, "unknown_category"),
+        ]
         result = calculate_budget_breakdown(txns, model_key="60_20_20")
         assert result["breakdown"]["wants"]["amount"] == pytest.approx(75.0)
 
@@ -116,8 +119,8 @@ class TestModel60_20_20:
     @pytest.mark.parametrize(
         "needs_spend,expected_on_track",
         [
-            (550.0, True),   # 55% < 60% → on_track
-            (600.0, True),   # exactly 60% → on_track (lte is inclusive)
+            (550.0, True),  # 55% < 60% → on_track
+            (600.0, True),  # exactly 60% → on_track (lte is inclusive)
             (601.0, False),  # 60.1% > 60% → off_track
         ],
     )
