@@ -264,49 +264,26 @@ class TestSpendingTrendsTotalSpent:
 
 
 class TestSpendingTrendsWithSampleData:
-    def test_sample_data_has_three_months(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_spending_trends(txns)
+    def test_sample_data_has_three_months(self, sample_transactions):
+        result = calculate_spending_trends(sample_transactions)
         assert result["months_shown"] == 3
-        months = [entry["month"] for entry in result["trend"]]
-        assert "2026-01" in months
-        assert "2026-02" in months
-        assert "2026-03" in months
+        assert {entry["month"] for entry in result["trend"]} == {"2026-01", "2026-02", "2026-03"}
 
-    def test_sample_data_months_1_returns_march(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_spending_trends(txns, months=1)
+    def test_sample_data_months_1_returns_march(self, sample_transactions):
+        result = calculate_spending_trends(sample_transactions, months=1)
         assert result["months_shown"] == 1
         assert result["trend"][0]["month"] == "2026-03"
 
-    def test_sample_data_savings_excluded_from_total(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_spending_trends(txns)
+    def test_sample_data_savings_excluded_from_total(self, sample_transactions):
+        result = calculate_spending_trends(sample_transactions)
         cats = [c["category"] for c in result["trend"][0]["top_categories"]]
         assert "savings" not in cats
         assert "retirement" not in cats
 
-    def test_sample_data_top_categories_capped_at_5(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_spending_trends(txns)
+    def test_sample_data_top_categories_capped_at_5(self, sample_transactions):
+        result = calculate_spending_trends(sample_transactions)
         assert len(result["trend"][0]["top_categories"]) <= 5
 
-    def test_sample_data_total_spent_is_positive(self, sample_data_dir):
-        from src.loaders.csv_loader import CSVLoader
-
-        loader = CSVLoader(sample_data_dir)
-        txns = loader.load_transactions()
-        result = calculate_spending_trends(txns)
+    def test_sample_data_total_spent_is_positive(self, sample_transactions):
+        result = calculate_spending_trends(sample_transactions)
         assert result["trend"][0]["total_spent"] > 0

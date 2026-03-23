@@ -155,6 +155,13 @@ def sample_data_dir():
     return Path(__file__).parent.parent / "data" / "sample"
 
 
+@pytest.fixture
+def sample_transactions(sample_data_dir):
+    from src.loaders.csv_loader import CSVLoader
+
+    return CSVLoader(sample_data_dir).load_transactions()
+
+
 # ---------------------------------------------------------------------------
 # Temporary CSV directory factory for CSVLoader edge-case tests
 # ---------------------------------------------------------------------------
